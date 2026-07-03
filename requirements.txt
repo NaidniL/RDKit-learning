@@ -1,0 +1,6 @@
+rdkit
+jupyterlab
+pandas
+numpy
+matplotlib
+pillow
