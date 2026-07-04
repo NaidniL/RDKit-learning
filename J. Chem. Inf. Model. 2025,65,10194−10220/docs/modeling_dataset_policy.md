@@ -1,11 +1,11 @@
 # 建模数据集组装、泄漏审计与 split v1 策略（待审查稿）
 
-本文档规定阶段 2 的数据集组装、化合物级解析、数据划分、泄漏审计和冻结规则。
-本阶段不生成特征、不训练模型，也不修改阶段 1 已冻结的 `data/processed/`。
+本文档规定阶段 2 的来源记录重建、结构实体组装、角色内标签解析、数据划分、泄漏审计和冻结规则。
+本阶段不生成模型特征、不训练模型，也不修改阶段 1 已冻结的 `data/processed/`。
 
-## 1. 冻结基线与范围
+## 1. 冻结基线、权限与输入
 
-阶段 2 只接受以下清洗冻结点作为输入：
+阶段 2 只接受以下清洗冻结点：
 
 - Git 标签：`dataset-cleaning-v1`；
 - 正式清洗 run-id：`20260704_130911_599434_UTC_a2cf0ca3`；
@@ -13,126 +13,68 @@
 - 清洗输入指纹：
   `a2cf0ca354b4d3cbaee8e8b37e4de0afb481fa633a59341ed0f33f281784e93d`。
 
-`data/processed/` 是只读输入。组装程序不得覆盖、修补或重新解释其中任何文件；若发现
-阶段 1 的错误，应回到新的清洗版本，而不是在阶段 2 静默更正。
+`data/processed/` 是只读输入。组装程序不得覆盖、修补或重新解释其中任何文件。
 
-### 1.1 13 张清洗表的使用方式
+### 1.1 v1 的权限边界
 
-不得把 13 张 CSV 直接纵向拼接。它们包含来源记录、化合物聚合结果、划分结果和排除视图，
-直接拼接会重复计算同一证据。
+阶段 2 v1 是重建、验证和重新打包阶段，不拥有新增、删除、换边或改标签的权限：
+
+- development membership 和标签必须与 `development_pool.csv` 完全一致；
+- train 和 validation membership 必须分别与阶段 1 同名文件完全一致；
+- primary external membership 和标签必须与 `external_ccris_test.csv` 完全一致；
+- 阶段 1 的 conflict、uncertain、structure conflict 和 excluded 项继续保持不进入主 split。
+
+阶段 2 会重新计算标签、结构状态和泄漏状态以验证上述结果。阶段 1 的若干派生 CSV 是互斥的
+优先级视图，不是完整的正交状态表；阶段 2 可以从来源事实中显式恢复被更高优先级排除原因遮蔽的
+并发原因，但不得因此改变任何 primary membership 或标签。
+
+冻结数据的确定性回归事实为：来源记录可重建 614 个 `compound_id × dataset_role` 明确标签冲突；
+`conflict_set.csv` 是其中 `structure_status=eligible` 的 613 项精确子集。额外一项为 development 的
+`VZUNGTLZRAYYDE-UHFFFAOYSA-N`，它同时属于已知 structure representation conflict，因阶段 1 先按
+结构排除而未进入 conflict 视图。阶段 2 必须同时保留它的 `label_status=conflict` 和
+`structure_status=ineligible`，并纳入人工确认；这不视为新的阶段 1 错误。
+
+除上述由阶段 1 优先级可完全解释的正交共存原因外，新的 structure-eligible 标签冲突、primary
+泄漏、资格变化或无法解释的派生视图差异都会使组装失败。需要改变 membership 时，必须回到新的
+清洗版本或提升组装策略版本，不能继续称为 split v1。
+
+### 1.2 13 张清洗表的使用方式
+
+不得把 13 张 CSV 纵向拼接。它们包含来源事实、化合物视图、划分视图和排除视图，直接拼接会
+重复计算同一证据。
 
 - `source_records_audit.csv` 是来源级事实表，用于构建 `records_all.csv`；
 - `development_pool.csv`、`external_ccris_test.csv`、`conflict_set.csv`、
-  `uncertain_set.csv` 和各 review candidate 表是阶段 1 的化合物级决策视图；
+  `uncertain_set.csv` 和 review candidate 表是阶段 1 的化合物级决策视图；
 - `excluded_set.csv` 提供排除原因和仍需参与泄漏拦截的结构键；
-- `structure_representation_conflict.csv` 提供结构表示异常；
-- `train.csv` 和 `validation.csv` 只用于核对论文复刻划分，不作为来源记录再次输入。
+- `structure_representation_conflict.csv` 提供已知结构表示异常；
+- `train.csv` 和 `validation.csv` 只用于逐键核对论文复刻划分。
 
-组装程序必须核对这些派生视图与来源事实表之间的一致性。任何无法解释的缺失、增量或标签
-变化均使组装失败。
+组装程序必须按阶段 1 的优先级语义核对派生视图与来源事实表：互斥视图可以省略被更高优先级
+原因遮蔽的次级状态，但重建后的 primary membership 和标签必须完全一致。任何不能由已登记
+优先级解释的缺失、增量或标签变化均使组装失败。
 
-## 2. 统一建模端点与证据语义
+## 2. 统一端点与来源证据
 
 ### 2.1 主任务标签
-
-主任务为化学物质致癌危害的严格二分类：
 
 ```text
 1 = carcinogen
 0 = noncarcinogen
 ```
 
-只允许阶段 1 中 `label_category=positive/negative` 且 `label_confidence=high` 的致癌性证据
-产生 `normalized_label`。这两种组合在本文中简称“明确阳性”和“明确阴性”。ambiguous、
-equivocal、inadequate、not classifiable、suggestive、
-probable、possible、部分阳性、带限定语结果以及非致癌性终点不得被强制映射为 0 或 1。
+只允许阶段 1 中 `label_category=positive/negative` 且 `label_confidence=high` 的致癌性证据产生
+二分类标签。ambiguous、equivocal、inadequate、not classifiable、suggestive、probable、possible、
+部分阳性、带限定语结果和非致癌性终点不得被强制映射为 0 或 1。
 
-### 2.2 来源标签映射
-
-| 来源 | `normalized_label=1` | `normalized_label=0` | 不进入主任务 |
+| 来源 | 标签 1 | 标签 0 | 非二分类 |
 |---|---|---|---|
-| CPDB | 原始代码 `+`、`c` 且试验充分 | 原始代码 `-` 且试验充分 | `p`、`a`、`e`、`0`、空值、`inad=i` 及其他非明确类别 |
-| IRIS | `A (Human carcinogen)`、`Carcinogenic to humans` | `E (Evidence of non-carcinogenicity for humans)` | probable、possible、likely、suggestive、D 类、证据不足、无法分类及带条件的 not likely |
-| CCRIS | 致癌性试验结果规范化后严格等于 `POSITIVE` | 致癌性试验结果规范化后严格等于 `NEGATIVE` | 带限定语结果、非致癌性终点、方向不明或证据不足结果 |
+| CPDB | `+`、`c` 且试验充分 | `-` 且试验充分 | `p`、`a`、`e`、`0`、空值、`inad=i` 等 |
+| IRIS | `A (Human carcinogen)`、`Carcinogenic to humans` | `E (Evidence of non-carcinogenicity for humans)` | probable、possible、likely、suggestive、D 类、证据不足、无法分类和带条件的 not likely |
+| CCRIS | 致癌性结果严格等于 `POSITIVE` | 致癌性结果严格等于 `NEGATIVE` | 带限定语、非致癌性终点、方向不明或证据不足 |
 
-上述规则必须从阶段 1 的 `label_raw`、`label_category`、`label_candidate`、
-`label_confidence` 和 `label_reason` 重建并断言一致，不得只相信最终 `label_binary`。
-
-### 2.3 多物种、多性别和多实验聚合
-
-来源级记录不先按物种、性别或试验次数多数投票。标签必须先在数据角色内独立解析：development
-只使用 CPDB/IRIS 证据，external 只使用 CCRIS 证据。对同一角色内的同一标准化结构：
-
-1. 所有明确阳性且无明确阴性：解析为 1；
-2. 所有明确阴性且无明确阳性：解析为 0；
-3. 明确阳性与明确阴性并存：标记 `exact_duplicate_conflicting_label`；
-4. 只有不确定或候选证据：不进入主任务；
-5. 明确标签与相反方向弱证据并存：保留明确标签，同时标记
-   `discordant_nonclear_evidence`，进入敏感性分析清单。
-
-弱证据不得推翻明确证据，也不得用于打破明确标签冲突。冲突不能按来源数、记录数或数据库数
-多数投票后静默解决。
-
-跨角色证据永不共同投票。若同一完整结构同时出现在 development 与 external，development 标签
-只由 CPDB/IRIS 解析，CCRIS 记录只进入跨角色重复与泄漏审计；CCRIS 标签不得改写、确认或冲突化
-development 标签。只有通过 development 泄漏隔离的 external-only 结构，才用 CCRIS 证据解析
-external 标签。
-
-### 2.4 人体与动物证据
-
-Scheme C v1 延续阶段 1 的角色定义：CPDB 和严格 IRIS 证据构成 development pool，
-严格 CCRIS 证据构成 external evaluation pool。人体证据和动物证据允许共同服务于“致癌危害”
-主任务，但必须保留 `evidence_type`、物种、来源和证据层级，不得将其伪装为同一种实验。
-
-必须分别报告来源和证据类型的类别分布，并执行第 7 节定义的确定性来源偏倚统计；若来源与标签
-高度关联，应视为数据偏倚信号。不得将 `source_dataset`、`evidence_type`、物种或来源 ID 用作
-正式结构模型特征。
-
-external test 的 0/1 语义必须与 development 完全相同，但来源证据体系可以不同；该差异必须在
-数据概况和局限性中披露。
-
-`evidence_type` 使用受控枚举：所有 IRIS 致癌分类记录（包括非二分类和候选类别）均为
-`human_weight_of_evidence`；有明确实验动物物种的 CPDB/CCRIS 记录为
-`animal_experimental`；无法从来源字段可靠判定物种的 CPDB/CCRIS 实验记录为
-`experimental_unspecified`。标签是否进入主任务只由 `label_rule` 决定，不由 evidence type 决定。
-不得根据化合物名称或最终标签猜测证据类型。`records_all.csv` 每行必须恰好有一个非空且合法的
-`evidence_type`。
-
-## 3. 来源级与化合物级数据模型
-
-### 3.1 `records_all.csv`
-
-`records_all.csv` 每行对应一条阶段 1 来源记录，不因标签、可建模性或 split 资格而删除。必须无损
-保留 `source_records_audit.csv` 的全部原列、原始文本和 JSON 字段，再新增以下别名或派生字段：
-
-```text
-record_key
-source_dataset
-source_record_id
-source_chemical_id
-source_label
-normalized_label
-label_rule
-label_confidence
-evidence_type
-endpoint
-species
-route
-reference
-canonical_smiles
-parent_smiles
-standardized_inchikey
-connectivity_key
-murcko_scaffold
-model_structure_ok
-exclusion_reason
-cleaning_run_id
-```
-
-`record_key` 固定为 `source_dataset + ":" + source_record_id`。两部分均不得为空，组合键必须唯一。
-`source_label` 保留原始标签文本；`label_rule` 使用受控代码指明映射规则，不能只写自由文本。
-原表中的 `source_payload_json`、`structure_provenance`、`raw_smiles`、
-`leakage_connectivity_keys_json` 和人工无机碳审核字段不得删除或摘要化。
+映射必须从 `label_raw`、`label_category`、`label_candidate`、`label_confidence` 和 `label_reason`
+重建并断言一致，不能只相信 `label_binary`。
 
 `label_rule` 只允许：
 
@@ -147,471 +89,757 @@ nonbinary_uncertain
 noncarcinogenicity_endpoint_only
 ```
 
-每条记录必须命中且只命中一个标签规则。无法映射的新来源值直接失败，不允许使用
-`unknown` 或默认阴性兜底。
+每条来源记录必须命中且只命中一个规则；新值或未知值直接失败，不允许默认阴性兜底。
 
-### 3.2 `compounds_resolved.csv`
+### 2.2 角色内独立解析
 
-该表一化合物一行。`compound_id` 固定为：
+标签必须先在数据角色内解析：development 只使用 CPDB/IRIS，external 只使用 CCRIS。对同一
+`compound_id × dataset_role`：
+
+1. 只有明确阳性：`label_status=clear_positive`、`role_normalized_label=1`；
+2. 只有明确阴性：`label_status=clear_negative`、`role_normalized_label=0`；
+3. 明确阳性与明确阴性并存：`label_status=conflict`、标签为空；
+4. 只有不确定或候选证据：`label_status=uncertain`、标签为空；
+5. 明确标签与相反方向弱证据并存：保留明确标签，同时增加
+   `discordant_nonclear_evidence` 审计标志。
+
+不按物种、性别、试验次数、来源数或数据库数多数投票。弱证据不得推翻明确证据或打破明确冲突。
+
+跨角色证据永不共同投票。同一结构可以同时具有 development=1 和 external=0；两条角色解析必须
+同时保留。external 证据不得确认、改写或冲突化 development 标签。
+
+### 2.3 证据类型
+
+`evidence_type` 只允许：
+
+- 所有 IRIS 致癌分类记录：`human_weight_of_evidence`；
+- 有明确实验动物物种的 CPDB/CCRIS：`animal_experimental`；
+- 物种无法可靠判定的 CPDB/CCRIS：`experimental_unspecified`。
+
+标签资格只由 `label_rule` 决定。每条 `records_all.csv` 记录必须恰好有一个合法、非空
+`evidence_type`。来源、证据类型、物种或来源 ID 不得成为正式结构模型特征。
+
+## 3. 三层数据模型
+
+### 3.1 来源记录：`records_all.csv`
+
+每行对应 `source_records_audit.csv` 的一条来源记录。必须无损保留其全部原列、原始文本和 JSON
+字段，再新增：
 
 ```text
-CMP:<standardized_inchikey>
+record_key
+source_dataset
+source_label
+normalized_label
+label_rule
+evidence_type
+cleaning_run_id
 ```
 
-该 ID 与数据角色和 split 无关，可直接复算且不会因来源增加而改变。输入 InChIKey 必须符合
-标准格式；重复 `compound_id` 立即失败。多种来源表示按下述已知冲突规则处理，不能任取第一行。
+不得删除或摘要化 `source_payload_json`、`structure_provenance`、`raw_smiles`、
+`leakage_connectivity_keys_json` 和人工无机碳审核字段。
 
+#### record key 预检查
+
+执行前必须断言：
+
+- `source_dataset` 和 `source_record_id` 非空；
+- `source_dataset` 属于固定枚举 `cpdb/iris/ccris`；
+- `source_record_id` 在同一 `source_dataset` 内唯一；
+- 不使用 DataFrame 行号或文件行号兜底。
+
+冻结数据的 `source_record_id` 可以包含冒号，因此不使用未转义字符串拼接。`record_key` 固定为：
+
+```text
+REC:<sha256(canonical_json([source_dataset, source_record_id]))>
+```
+
+其中 canonical JSON 使用第 10 节规范。生成后再次断言全局唯一。
+
+### 3.2 结构实体：`compounds.csv`
+
+只要来源记录具有有效 `standardized_inchikey`，就形成一个结构实体：
+
+```text
+compound_id = CMP:<standardized_inchikey>
+```
+
+`compounds.csv` 一结构一行，只保存结构身份、结构表示和来源追溯，不保存角色标签或 split 资格。
 至少包含：
 
 ```text
 compound_id
+standardized_inchikey
+connectivity_key
 canonical_smiles
 parent_smiles
 source_canonical_smiles_json
 parent_smiles_variants_json
-standardized_inchikey
-connectivity_key
 nonisomeric_parent_smiles
 tautomer_family_key
 murcko_scaffold
-normalized_label
-source_datasets_json
+structure_status
+structure_reasons_json
 source_record_keys_json
-source_labels_json
-evidence_types_json
-primary_role
-label_resolution_record_keys_json
-label_resolution_sources_json
-nonresolution_record_keys_json
-resolution_status
-resolution_rule
-split_eligibility
 cleaning_run_id
 ```
 
-所有 JSON 数组先去重再按 Unicode 字典序排序，使用固定 JSON 序列化参数。来源增加不得覆盖旧来源。
-`primary_role` 只允许 `development` 或 `external`。同一完整键跨角色时取 `development`；
-`label_resolution_record_keys_json` 只能包含该 primary role 中实际参与标签解析的明确证据，其他角色、
-弱证据和非致癌性终点进入 `nonresolution_record_keys_json`。程序必须断言两个集合无交集且并集可
-回溯到该 compound 的全部来源记录。
+无有效标准键的记录不能伪造 `compound_id`，只进入 `records_all.csv`、`record_exclusions.csv` 和统计。
 
-只有能够生成有效 `standardized_inchikey` 的来源记录才能形成 `compound_id` 并进入
-`compounds_resolved.csv`。无有效键的记录只保留在 `records_all.csv` 和 record-level 排除统计中。
-`excluded_structure` 仅用于“已有有效标准键、但因混合物等阶段 1 规则不可建模”的 compound，
-不能为无键记录伪造 ID。
+#### 结构代表字段
 
-结构代表字段按以下规则生成：
+1. `source_canonical_smiles_json` 保留全部非空来源 canonical SMILES；
+2. `parent_smiles_variants_json` 保留全部非空 parent SMILES；
+3. parent 变体恰好一个时，`parent_smiles` 取该值，`canonical_smiles` 由该 parent 重新解析后使用
+   `MolToSmiles(canonical=True, isomericSmiles=True)` 生成；
+4. parent 变体多于一个时，必须与冻结的 `structure_representation_conflict.csv` 中同一 InChIKey
+   的变体集合完全一致。已知 4 个键设置 `structure_status=ineligible`，所有单值代表结构和派生结构
+   字段留空，全部变体仍由 JSON 保存；
+5. 新的多 parent 键、已声明键缺失、额外声明或变体集合不一致都会使组装失败；
+6. 来源 canonical 多值但 parent 唯一不构成结构冲突，不得任取来源首行作为代表。
 
-1. `source_canonical_smiles_json` 保留该键全部非空来源 `canonical_smiles`；
-2. `parent_smiles_variants_json` 保留全部非空 `parent_smiles`；
-3. 若 parent 变体恰好一个，`parent_smiles` 取该唯一值，`canonical_smiles` 由该 parent 重新解析后用
-   RDKit `MolToSmiles(canonical=True, isomericSmiles=True)` 生成，不得从来源 canonical 值任选；
-4. 若 parent 变体多于一个，必须与冻结的 `structure_representation_conflict.csv` 中同一 InChIKey
-   声明的变体集合完全一致。该 compound 保留在主表中，但 `canonical_smiles`、`parent_smiles`、
-   `nonisomeric_parent_smiles` 和 `tautomer_family_key` 留空，设置
-   `resolution_status=excluded_structure`、`resolution_rule=structure_ineligible`、
-   `split_eligibility=ineligible_structure`；
-5. 任何未在阶段 1 冲突表声明的新多 parent 键、已声明键缺失、变体集合不一致或声明出现额外键，
-   均使组装失败。
+`structure_status` 在 compound 层只允许 `eligible` 或 `ineligible`。无标准键的 record-level 状态为
+`no_standardized_key`，不进入 compound 层。
 
-因此，冻结数据中已知的 4 个结构表示冲突应被确定性承接并排除，而不是作为新错误中止；来源
-canonical 多值但 parent 唯一时不构成结构冲突，全部来源表示仍由 JSON 字段保留。
+### 3.3 角色解析：`compound_role_resolutions.csv`
 
-### 3.3 解析状态与排除表
-
-`resolution_status` 只允许：
+每行对应一个 `compound_id × dataset_role`。至少包含：
 
 ```text
-resolved
-manual_review_required
-excluded_conflict
-excluded_uncertain
-excluded_structure
-excluded_leakage
+compound_id
+dataset_role
+role_normalized_label
+label_status
+review_status
+label_resolution_record_keys_json
+nonresolution_record_keys_json
+label_resolution_sources_json
+structure_status
+leakage_status
+tautomer_overlap_reported
+split_eligibility
+exclusion_reasons_json
+resolution_rules_json
+cleaning_run_id
 ```
 
-无法获得唯一二分类标签的结构不得出现在 `compounds_resolved.csv` 的可划分子集中。冲突、人工
-决策和排除轨迹写入 `excluded_conflicts.csv`，其中保留全部来源键、证据 JSON、规则、审核决定、
-理由、审核人和时间。若启用人工冲突解析，唯一机器可读输入为：
+同一结构跨角色时保留两行。例如 development 可以 `eligible`，external 同时因
+`exact_overlap` 为 `ineligible_leakage`。不得使用单一 `primary_role` 或单一全局标签覆盖角色状态。
+
+### 3.4 三个独立状态轴
+
+`label_status`：
+
+```text
+clear_positive
+clear_negative
+conflict
+uncertain
+```
+
+`structure_status`：
+
+```text
+eligible
+ineligible
+```
+
+`no_standardized_key` 只用于 record-level exclusion，不会出现在角色解析表。
+
+`leakage_status`：
+
+```text
+not_applicable
+clear
+exact_overlap
+connectivity_overlap
+tautomer_overlap_reported
+```
+
+development 固定为 `not_applicable`。external 按严重程度
+`exact_overlap > connectivity_overlap > tautomer_overlap_reported > clear` 取一个值；
+`tautomer_overlap_reported` 不影响 primary external 资格，另由敏感性集处理。
+
+`review_status`：
+
+```text
+not_required
+pending
+confirmed_exclude
+```
+
+#### 合法组合与资格派生
+
+| 条件（按顺序） | `split_eligibility` | 必须加入的排除原因 |
+|---|---|---|
+| `structure_status=ineligible` | `ineligible_structure` | 全部结构原因 |
+| 否则 `label_status in {conflict, uncertain}` | `ineligible_label` | `label_conflict` 或 `label_uncertain` |
+| 否则 external 且 `leakage_status=exact_overlap` | `ineligible_leakage` | `external_exact_overlap` |
+| 否则 external 且 `leakage_status=connectivity_overlap` | `ineligible_leakage` | `external_connectivity_overlap` |
+| 否则标签明确、结构合格且 leakage 为 `not_applicable/clear/tautomer_overlap_reported` | `eligible` | 无 primary 排除原因 |
+
+附加合法性约束：
+
+- `clear_positive` 必须对应标签 1，`clear_negative` 必须对应标签 0；
+- `conflict/uncertain` 的标签必须为空；
+- `conflict` 在 audit 可为 `pending/confirmed_exclude`，正式 release 只能为
+  `confirmed_exclude`；
+- 非 conflict 必须为 `not_required`；
+- development 的 leakage 只能为 `not_applicable`；external 不得为 `not_applicable`；
+- `exclusion_reasons_json` 保留所有同时成立的标签、结构、泄漏原因，不因资格优先级丢失信息；
+- 表驱动校验所有组合，未知枚举或非法组合直接失败。
+
+`resolution_rules_json` 中的规则枚举至少覆盖：
+
+```text
+unanimous_clear_positive
+unanimous_clear_negative
+confirmed_exact_label_conflict_exclude
+no_clear_binary_label
+structure_ineligible
+external_exact_leakage
+external_connectivity_leakage
+external_tautomer_overlap_reported
+```
+
+一个角色行可以有多个规则，固定为去重、排序 JSON 数组；不得用单一规则覆盖其他维度。
+
+### 3.5 排除表
+
+`compound_exclusions.csv` 一行对应一个 compound-role-reason，包含标签、结构、泄漏等全部
+compound-level 排除，不只保存冲突。唯一键为
+`compound_id, dataset_role, exclusion_reason`。
+
+`record_exclusions.csv` 保存无标准键及其他无法形成 compound 的来源级排除，至少包含
+`record_key, source_dataset, source_record_id, exclusion_reason`。
+
+专项 `label_conflicts.csv` 是 `compound_exclusions.csv` 和角色解析表的报告视图，不能代替完整排除表。
+
+## 4. 人工冲突审核
+
+阶段 1 来源事实中重建出的所有 614 个确定性 compound-role 标签冲突在 split v1 中继续排除，
+包括被结构优先排除遮蔽的 `VZUNGTLZRAYYDE-UHFFFAOYSA-N × development`。正式 release 前必须
+100% 人工确认。
+唯一机器可读输入为：
 
 ```text
 data/manual/modeling_conflict_decisions.csv
 ```
 
-模板字段固定为 `compound_id, decision, review_reason, reviewer, reviewed_at_utc`。
-
-split v1 不允许在阶段 2 将阶段 1 已排除的冲突重新纳入 development。确定性标签冲突默认按
-`exact_label_conflict_exclude` 自动排除；人工文件仅用于追加 `confirm_exclude` 审核决定，不得把
-冲突改为阳性或阴性。所有人工决定必须有理由和审核人；空值、未知 compound ID、重复决定或
-`confirm_exclude` 之外的决定都会阻止正式组装。未人工确认的冲突仍按明确策略排除，不是 pending。
-若未来需要把冲突纳入主 split，必须回到新的清洗/组装策略版本，不能继续称为 split v1。
-
-人工决策模板还必须包含必填 `reviewed_at_utc`，使用带时区的 RFC 3339 UTC 字符串。审核时间是
-固定输入的一部分；程序不得用运行时当前时间填充记录，否则相同输入不能产生相同输出哈希。
-
-`resolution_rule` 只允许：
+字段固定为：
 
 ```text
-unanimous_clear_positive
-unanimous_clear_negative
-exact_label_conflict_exclude
-manual_confirmed_conflict_exclude
-no_clear_binary_label
-structure_ineligible
-external_exact_leakage
-external_connectivity_leakage
+compound_id,dataset_role,decision,review_reason,reviewer,reviewed_at_utc
 ```
 
-`split_eligibility` 只允许 `eligible`、`ineligible_label`、`ineligible_structure`、
-`ineligible_conflict`、`ineligible_leakage`。状态、规则和资格之间的合法组合必须用表驱动校验。
+只允许 `decision=confirm_exclude`。理由和审核人非空；时间必须是 UTC
+`YYYY-MM-DDTHH:MM:SSZ`。组合键 `compound_id,dataset_role` 必须唯一，未知、重复或非冲突对象直接
+失败。
 
-## 4. 跨来源重复和结构关系审计
+第一次 dry-run 可以产生 `review_status=pending` 和人工候选表。修改人工文件后原 dry-run 失效，
+必须重新测试和 dry-run。最终待批准 dry-run 和正式 release 要求冲突覆盖率 100%，不得包含
+`pending`。人工审核不获得把冲突改成阳性或阴性的权限。
 
-### 4.1 等价层次与受控分类
+## 5. 重复组与结构关系
 
-按以下顺序分类，每组只使用第一个适用的主分类，并可附加次级标志：
+### 5.1 来源记录重复组
 
-1. 完整 `standardized_inchikey` 相同，在角色内分别判断标签：
-   `exact_duplicate_same_label` 或 `exact_duplicate_conflicting_label`；
-2. 完整键不同但 `connectivity_key` 相同，且清除立体/同位素标记后的 parent 相同：
-   `stereo_variant_same_label` 或 `stereo_variant_conflicting_label`；
-3. RDKit 规范互变异构后属于同一 `tautomer_family_key`：`tautomer_related`；
-4. Morgan/ECFP4 Tanimoto 相似度不低于 0.85：
-   `high_similarity_same_label` 或 `high_similarity_opposite_label`；
-5. 不满足以上关系：`unique`。
+exact duplicate 是同一 compound 内部来源记录的聚合结果，不是两个 compound 间的边。
+`duplicate_groups.csv` 一行对应 `compound_id × dataset_role`，至少包含：
 
-跨角色的同结构或相关结构另加 `cross_role_overlap`；若两角色各自解析出的标签相反，再加
-`cross_role_label_disagreement`。这些次级标志只用于审计，不参与 development 标签投票。
+```text
+compound_id
+dataset_role
+record_count
+record_keys_json
+source_labels_json
+exact_duplicate_class
+```
 
-`nonisomeric_parent_smiles` 和 `tautomer_family_key` 的算法、RDKit 版本和参数必须进入输入指纹。
-结构算法失败时不得降级为名称或 CASRN 去重。
+`exact_duplicate_class` 只允许：
 
-`nonisomeric_parent_smiles` 从阶段 1 的 `parent_smiles` 解析：清除原子手性、双键立体标记和同位素
-编号后，以 `canonical=True, isomericSmiles=False` 生成 SMILES。`tautomer_family_key` 在该分子上
-使用与阶段 1 相同配置的 RDKit `TautomerEnumerator` 生成 canonical tautomer，再生成 canonical
-non-isomeric SMILES，并定义为 `TAU:` 加该 SMILES UTF-8 字节的完整 SHA-256。空值或算法失败必须
-显式报告，不能用原字符串或名称兜底。配置显式调用 `SetRemoveSp3Stereo(False)` 和
-`SetReassignStereo(True)`，其余参数保持已锁定 RDKit 版本的默认值并写入 runtime signature。
+```text
+single_record
+exact_duplicate_same_label
+exact_duplicate_conflicting_label
+exact_duplicate_nonbinary
+```
 
-ECFP4 固定使用 RDKit `GetMorganFingerprintAsBitVect`：`radius=2`、`nBits=2048`、
+### 5.2 结构关系边
+
+`structure_relation_edges.csv` 只允许 `compound_id_a != compound_id_b`。每行是一条结构关系在一个
+标签比较 scope 下的结果，至少包含：
+
+```text
+comparison_scope
+compound_id_a
+dataset_role_a
+compound_id_b
+dataset_role_b
+relation_type
+similarity
+label_a
+label_b
+label_relation
+```
+
+`comparison_scope` 为 `development/external/cross_role`。无序结构 ID 始终按 Unicode 字典序满足
+`compound_id_a < compound_id_b`，角色字段保留实际比较方向。
+
+`relation_type` 只允许：
+
+```text
+same_connectivity
+stereo_variant
+tautomer_related
+high_similarity
+```
+
+同一 pair 可有多种 relation，每种各一行；唯一键为
+`comparison_scope, compound_id_a, dataset_role_a, compound_id_b, dataset_role_b, relation_type`。
+
+每种 edge 的触发条件固定如下：
+
+- `same_connectivity`：两端 compound ID 不同、两端 `connectivity_key` 均非空且完全相同；
+- `stereo_variant`：满足 `same_connectivity`，两端完整 InChIKey 不同，并且非空
+  `nonisomeric_parent_smiles` 完全相同；满足时同时输出 `same_connectivity` 和
+  `stereo_variant` 两条 edge；
+- `tautomer_related`：两端 compound ID 不同、非空 `tautomer_family_key` 完全相同；无论是否还
+  满足 connectivity 条件，都单独输出该 edge；
+- `high_similarity`：两端 compound ID 不同且固定 ECFP4 Tanimoto ≥0.85；无论是否满足其他关系，
+  都单独输出该 edge。
+
+`similarity` 只在 `high_similarity` edge 中写入固定序列化的有限浮点值，其他 relation 留空。
+
+`label_relation` 独立取 `same/opposite/not_comparable`。任一端没有明确角色标签时为
+`not_comparable`。`label_discordant_near_neighbors.csv` 只从
+`relation_type=high_similarity AND label_relation=opposite` 派生，并在说明中保留
+“activity-cliff candidate”作为论文对照术语。
+
+比较宇宙为 `compounds.csv` 中结构合格且 parent 可解析的 compound；角色 scope 由角色解析表决定。
+exact cross-role overlap 是同一 compound 的两个角色行，不进入 pair 表，记录在角色解析和泄漏报告。
+
+### 5.3 结构算法
+
+`nonisomeric_parent_smiles`：从标准化 parent 清除原子手性、双键立体和同位素编号后，使用
+`MolToSmiles(canonical=True, isomericSmiles=False)`。
+
+`tautomer_family_key`：对上述分子使用 RDKit `TautomerEnumerator`，显式设置
+`SetRemoveSp3Stereo(False)`、`SetReassignStereo(True)`，其余参数保持锁定版本默认值；canonical
+tautomer 转为 canonical non-isomeric SMILES 后，定义为
+`TAU:<完整 SHA-256(UTF-8 SMILES)>`。失败时显式报告，不允许名称兜底。
+
+ECFP4 固定为 `GetMorganFingerprintAsBitVect`：`radius=2`、`nBits=2048`、
 `useChirality=True`、`useBondTypes=True`、`useFeatures=False`、
-`includeRedundantEnvironments=False`。Tanimoto 使用 RDKit `DataStructs.TanimotoSimilarity`。
-指纹输入固定为阶段 1 的标准化 `parent_smiles`，保留其手性信息。
+`includeRedundantEnvironments=False`；输入为标准化 `parent_smiles`。Tanimoto 使用
+`DataStructs.TanimotoSimilarity`，阈值为 0.85。
 
-结构关系和高相似 pair 的比较宇宙固定为 `compounds_resolved.csv` 中具有可解析 `parent_smiles`、
-且 `resolution_status != excluded_structure` 的全部 compound，包括 resolved、conflict、uncertain
-和 leakage 状态。每个无序 pair 只保留一次：两个 `compound_id` 按 Unicode 字典序记为
-`compound_id_a < compound_id_b`；报告按关系优先级、`compound_id_a`、`compound_id_b` 排序。
+所有参数、RDKit 版本和实现签名进入输入指纹。
 
-### 4.2 解析原则
+## 6. Scheme C 与 split v1
 
-- 完全相同结构且标签相同：合并来源；
-- 完全相同结构但标签冲突：人工审核或排除，不多数投票；
-- stereo、tautomer 或高相似关系：默认不合并成一个化合物；
-- 非完全相同结构的异标签关系不用于自动改标签；
-- 同 connectivity 的不同结构不得跨 development 与 external；
-- 高相似异标签对作为 activity-cliff 候选永久报告；
-- 结构关系图的连通分量、成员、边类型和阈值必须可追溯。
+### 6.1 Primary 80:20 holdout
 
-至少生成：
-
-```text
-reports/dataset_assembly/current/duplicate_groups.csv
-reports/dataset_assembly/current/label_conflicts.csv
-reports/dataset_assembly/current/high_similarity_pairs.csv
-reports/dataset_assembly/current/activity_cliff_candidates.csv
-reports/dataset_assembly/current/resolution_summary.json
-```
-
-## 5. Scheme C 与 split v1
-
-### 5.1 角色优先级
-
-先按角色独立解析标签，再固定 development 泄漏全集，最后处理 external。development 泄漏全集
-只包含 `dataset_role=development` 的有效模型结构，以及同角色被排除但仍可解析的结构键；绝不把
-external 自身的 excluded 或 leakage key 加入 development 泄漏全集。任何 external 候选只要与该
-development 泄漏全集存在相同 `standardized_inchikey` 或 `connectivity_key`，均从 external test
-排除。不得通过先删除 development 结构来扩大 external。
-
-最终只有同时满足 `resolution_status=resolved` 且 `split_eligibility=eligible` 的 compound 才能进入
-主划分，并且必须恰好属于：
-
-```text
-primary_reproduction_split/train
-primary_reproduction_split/validation
-external_test
-```
-
-CV fold 是 train/development 内部的评估标注，不是第四个互斥数据角色。
-
-### 5.2 论文复刻协议
-
-主划分使用：
+主划分严格复现阶段 1：
 
 ```text
 sklearn.model_selection.train_test_split
-train : validation = 80 : 20
+test_size = 0.20
 random_state = 42
 stratify = normalized_label
 shuffle = True
 ```
 
-输入顺序严格使用 `data/processed/development_pool.csv` 中 `standard_inchikey` 的现有顺序，并先断言
-它已按该字段升序排列；然后调用固定版本 scikit-learn。完整 InChIKey 已在化合物解析阶段唯一化，
-因此 train 与 validation 不得存在完全结构交叉。论文复刻协议允许不同立体形式的相同
-`connectivity_key` 被随机分到两侧，但必须生成报告；该结果不得被描述为严格结构外推。
+输入使用 `development_pool.csv` 的现有顺序，并先断言它按 `standard_inchikey` 升序。新生成的
+train/validation InChIKey→标签映射必须分别与阶段 1 完全一致，任何增删、换边或改标签均失败。
 
-由于 v1 的标签与 development 资格应与阶段 1 完全一致，新生成的 train/validation InChIKey
-membership 必须分别与 `data/processed/train.csv` 和 `data/processed/validation.csv` 完全相等；
-任何增删或换边均使 dry-run 失败。未来若有意改变主划分，必须提升数据策略版本，不能继续称为
-split v1。
+### 6.2 三种独立 CV 协议
 
-最终 external test 的 `standardized_inchikey → normalized_label` 映射也必须与
-`data/processed/external_ccris_test.csv` 的 `standard_inchikey → label_binary` 完全一致；任何缺失、
-新增或标签变化均使 dry-run 失败。
+以下协议相互独立，不得混用其结果：
 
-同时为 development pool 冻结分层 5 折 CV：`StratifiedKFold(n_splits=5, shuffle=True,
-random_state=42)`。输入使用与主划分相同的 development 固定顺序；fold 编号为整数 0–4，按
-scikit-learn 产生顺序编号。`stratified_cv_folds.csv` 每个 development compound 恰好一行，字段固定为
-`compound_id, standardized_inchikey, normalized_label, fold_id`，`fold_id` 表示该 compound 作为验证集
-的折号；输出按 `standardized_inchikey` 升序排列。
+1. `full_development_stratified_cv_folds.csv`：完整 development 的分层 5 折，用于复现论文的独立
+   CV 评估；
+2. `full_development_scaffold_cv_folds.csv`：完整 development 的 scaffold-grouped 5 折，用于独立
+   稳健性评估；
+3. `train_tuning_cv_folds.csv`：只覆盖固定 train 的分层 5 折，供后续超参数选择使用，不包含固定
+   validation。
 
-### 5.3 稳健性 scaffold CV
+前两种 full-development CV 不得用于调参后再把固定 validation 描述为未参与选择的独立验证集。
+scaffold CV 也不得含糊地兼任 primary holdout 的调参工具。
 
-额外生成 Bemis-Murcko scaffold 分组 5 折，不替代论文复刻随机划分。先为每个 compound 建立
-基础组键：非空 Murcko scaffold 使用 `SCAFFOLD:<murcko_scaffold>`；空 scaffold 使用
-`ACYCLIC:<connectivity_key>`。再构建无向图：共享非空 scaffold 或共享 `connectivity_key` 的
-compound 之间连边。每个连通分量是最终 group，`group_key` 固定为该分量按 Unicode 字典序最小的
-`compound_id`。同一最终 group 不得跨 fold。
-
-确定性分配按以下顺序执行：
-
-1. group 按样本数降序；
-2. 同样本数时按阳性数降序；
-3. 再按 group key 字典序；
-4. 对每个候选 fold，临时加入当前 group 后计算全局分数：
-   `Σ_f[((n_f-N/5)/N)^2 + ((p_f-P/5)/P)^2 + ((q_f-Q/5)/Q)^2]`，其中 `n/p/q`
-   分别为 fold 的总数、阳性数、阴性数，`N/P/Q` 为全体对应数量；
-5. 选择分数最小的 fold；使用 IEEE 754 双精度原值比较，不做显示精度舍入；
-6. 分数完全相等时选择编号最小的 fold。
-
-每个 fold 应包含两个类别；无法满足时组装失败并要求修改已记录的协议，禁止静默减少折数。
-`scaffold_cv_folds.csv` 每个 development compound 恰好一行，字段固定为
-`compound_id, standardized_inchikey, normalized_label, murcko_scaffold, group_key, fold_id`；fold 编号为
-整数 0–4，输出按 `standardized_inchikey` 升序排列。
-
-输出目录：
+分层 CV 固定使用 `StratifiedKFold(n_splits=5, shuffle=True, random_state=42)`。输入分别使用完整
+development 或固定 train 的标准 InChIKey 升序；fold 编号为 0–4。输出每个输入 compound 恰好一行：
 
 ```text
-data/splits/v1/primary_reproduction_split/train.csv
-data/splits/v1/primary_reproduction_split/validation.csv
-data/splits/v1/primary_reproduction_split/stratified_cv_folds.csv
-data/splits/v1/robustness_scaffold_cv/scaffold_cv_folds.csv
-data/splits/v1/external_test.csv
+compound_id,standardized_inchikey,normalized_label,fold_id
 ```
 
-## 6. external test 隔离与泄漏审计
+### 6.3 Scaffold CV 的确定分组
 
-### 6.1 强制为零的交叉
+Murcko scaffold 固定生成算法：解析标准化 parent，调用
+`MurckoScaffold.GetScaffoldForMol`，调用 `Chem.RemoveStereochemistry`，再使用
+`MolToSmiles(canonical=True, isomericSmiles=False)`。无原子 scaffold 定义为空字符串。重算值必须
+与阶段 1 `murcko_scaffold` 一致，否则失败。
 
-正式提交前必须断言：
+每个 eligible compound 的 `connectivity_key` 必须非空。基础组键：非空 scaffold 使用
+`SCAFFOLD:<smiles>`，空 scaffold 使用 `ACYCLIC:<connectivity_key>`。共享非空 scaffold 或共享
+connectivity key 的 compound 连边；每个连通分量是最终 group，`group_key` 是分量中 Unicode
+字典序最小的 `compound_id`。
+
+确定性分配：
+
+1. group 按样本数降序、阳性数降序、group key 升序；
+2. 对每个候选 fold 计算加入该 group 后的全局分数：
+   `Σ_f[((n_f-N/5)/N)^2 + ((p_f-P/5)/P)^2 + ((q_f-Q/5)/Q)^2]`；
+3. `N/P/Q` 和所有 `n/p/q` 是整数，要求 `P>0`、`Q>0`；使用 `fractions.Fraction` 精确计算和比较，
+   禁止浮点近似；
+4. 分数相同时选 fold 编号最小者；
+5. 每个 fold 必须包含两个类别，否则失败。
+
+scaffold fold 输出 schema：
 
 ```text
-development ∩ external_test standardized_inchikey = 0
-development ∩ external_test connectivity_key = 0
-train ∩ validation standardized_inchikey = 0
-train ∩ external_test standardized_inchikey = 0
-validation ∩ external_test standardized_inchikey = 0
+compound_id,standardized_inchikey,normalized_label,murcko_scaffold,group_key,fold_id
 ```
 
-泄漏集合必须同时包含 development 的有效模型结构，以及 `excluded_set.csv` 中
-`dataset_role=development` 记录的所有可解析 `leakage_connectivity_keys_json`。不得加入
-`dataset_role=external` 的排除记录。这样被排除的 development 混合物或溶剂化物不能借 external
-重新进入，同时避免 external 对自身造成误排。
+## 7. External 隔离与敏感性集
 
-### 6.2 必须报告但不强制为零的关系
+### 7.1 Development 泄漏全集
 
-- train、validation 与 external 的 Murcko scaffold 重叠数和比例；
-- 每个 external compound 到 development/train 的最大 ECFP4 Tanimoto 相似度；
-- Tanimoto ≥ 0.85 的全部近邻对；
-- 高相似但标签相反的 activity-cliff 候选；
-- train 与 validation 的 connectivity overlap；
-- external 各来源、证据类型、标签的数量和比例。
+泄漏全集只包含：
 
-最大相似度计算使用与阶段 3 ECFP4 相同的 RDKit 参数；参数和实现版本进入 manifest。
+- `dataset_role=development` 的有效模型结构；
+- `excluded_set.csv` 中 `dataset_role=development` 记录的全部可解析
+  `leakage_connectivity_keys_json`。
 
-### 6.3 外部集不可用于调参
+绝不加入 external 自身的 excluded 或 leakage key。不得通过删除 development 扩大 external。
 
-external 标签可以为冻结和审计存在于文件中，但普通训练数据加载器默认不得读取
-`data/splits/v1/external_test.csv`。只有显式 `evaluation_mode="external_final"` 且提供冻结 manifest
-时才能加载。单元测试必须验证超参数搜索、特征选择、阈值选择、早停、校准和模型选择路径均不
-接收 external 数据。
+### 7.2 Primary external
 
-在模型定型前，报告不得输出 external 性能。对 external 的每次最终评估必须记录模型工件哈希、
-split manifest 哈希和时间，避免反复查看后人工调参。
-
-## 7. 划分后数据概况与来源偏倚
-
-对 train、validation、external test 分别报告：
-
-- 样本数、阳性数、阴性数和阳性率；
-- 来源与证据类型组成及其标签条件分布；
-- 分子量、Crippen LogP、TPSA、HBD、HBA、可旋转键、总环数、芳香环数和重原子数；
-- 唯一 Murcko scaffold 数、单例 scaffold 数和比例；
-- 到 train 的最大 ECFP4 相似度分布；计算 train 样本时必须排除 compound 自身，若不存在其他
-  train compound 则记为缺失；
-- 缺失、异常和描述符计算失败计数。
-
-连续变量至少报告 count、missing、mean、std、min、P05、P25、median、P75、P95、max。
-分布漂移同时报告标准化均值差和双样本 KS 统计量；这些是描述性诊断，不用于查看 external 后
-调整 split。KS 与列联表卡方统计固定使用锁定版本的 `scipy.stats`，SciPy 版本进入 runtime
-signature 和输入指纹。
-
-必须单独生成来源-标签列联表。本阶段不训练任何模型；来源偏倚使用确定性统计诊断：将已排序的
-`label_resolution_sources_json` 作为来源组合类别。该字段只根据
-`label_resolution_record_keys_json` 对应的来源生成，不得把被隔离的跨角色证据或弱证据算入
-development 的来源组合；`source_datasets_json` 仍无损表示该 compound 的全部来源。报告每类样本
-数、阳性率和相对全体阳性率的绝对差，并计算来源组合与标签的 Cramér's V。如果任一来源组合
-样本数不少于 20 且类别纯度
-`max(positive_rate, 1-positive_rate)` 不低于 0.90，
-或 Cramér's V 不低于 0.30，则 manifest 标记 `source_label_confounding_warning=true`。该警告不自动
-改变标签或 split。
-
-Cramér's V 使用未校正公式 `sqrt(chi2 / (n * min(r-1, c-1)))`；若分母为 0 则记为 0。
-列联表行、列排序和浮点输出精度必须固定并进入实现测试。
-
-建议输出：
+primary external 的 InChIKey→标签映射必须与阶段 1 `external_ccris_test.csv` 完全一致。强制断言：
 
 ```text
-reports/dataset_assembly/current/split_summary.csv
-reports/dataset_assembly/current/source_label_crosstab.csv
-reports/dataset_assembly/current/descriptor_summary.csv
-reports/dataset_assembly/current/scaffold_summary.csv
-reports/dataset_assembly/current/similarity_summary.csv
-reports/dataset_assembly/current/distribution_shift.csv
-reports/dataset_assembly/current/leakage_audit.json
+development ∩ primary_external exact InChIKey = 0
+development ∩ primary_external connectivity_key = 0
+train ∩ validation exact InChIKey = 0
+train ∩ primary_external exact InChIKey = 0
+validation ∩ primary_external exact InChIKey = 0
 ```
 
-## 8. 可审计运行、事务提交与冻结
+### 7.3 Tautomer 敏感性集
 
-### 8.1 目录
+跨角色 `tautomer_family_key` overlap 不改变 primary external membership，只强制报告到
+`cross_role_tautomer_overlaps.csv`。另生成：
 
 ```text
-audits/dataset_assembly/<run-id>/
-reports/dataset_assembly/current/
-data/modeling/v1/
-data/splits/v1/
+external_test_tautomer_clean_sensitivity.csv
 ```
 
-dry-run 的全部拟发布数据和报告都保存在唯一审计目录，不能写入三个正式目录。确定性 artifacts
-包括 modeling CSV、split CSV、关系/统计 CSV 及确定性 JSON 报告；run-specific envelope 只包括
-manifest 和运行日志。正式运行使用 `--approved-audit-run <run-id>`，先验证审计目录，再重新计算
-全部确定性 artifacts 并与批准审计逐文件比较哈希、字节数、行数和文件集合，最后以目录级事务
-同时替换正式 modeling、splits 和 current reports。任何不一致均不得留下部分正式输出。
+tautomer 比较全集是所有具有 development 角色、`structure_status=eligible` 且 tautomer key 非空的
+compound，不论其 development 标签是明确、冲突还是 uncertain。该敏感性集从 primary external 中
+删除与比较全集任一结构共享 tautomer family 的项；每个删除都保留原因和对应 development
+compound。敏感性集不得用于调参或替代 primary external 主结论。
 
-正式 manifest 和日志必须重新生成，以记录新的正式 run-id、`run_type=formal`、批准的 audit
-run-id 和正式运行时间，因此不要求与 dry-run 的 manifest/log 同哈希。正式 manifest 中的输入
-指纹、runtime signature、settings、确定性 output/report maps 必须与批准审计一致；正式日志必须
-由正式 manifest 记录并校验自身哈希。正式运行前还必须按审计 manifest 校验审计目录自身的全部
-文件集合、确定性 artifacts 哈希/行数及审计日志哈希，防止批准后被篡改。
+### 7.4 相似度与最近邻审计
 
-### 8.2 输入指纹
+必须报告：
+
+- train/validation/external 的 Murcko scaffold 重叠率；
+- 每个 external 到 train 的最大 ECFP4 Tanimoto；
+- Tanimoto ≥0.85 的近邻 pair；
+- `label_discordant_near_neighbors.csv`；
+- train/validation connectivity overlap；
+- external 各来源、证据类型和类别分布。
+
+`nearest_neighbors.csv` 至少包含：
+
+```text
+query_compound_id
+query_split
+nearest_compound_id
+nearest_split
+similarity
+query_label
+nearest_label
+label_relation
+```
+
+train 查询必须排除自身；没有其他 train compound 时相似度为空。所有并列最近邻按 compound ID
+选择字典序最小者，同时在高相似 pair 报告中保留全部并列关系。
+
+### 7.5 External 不可用于调参
+
+普通训练加载器默认不得读取 external。只有显式 `evaluation_mode="external_final"` 且提供冻结
+manifest 才能加载 primary external。单元测试必须验证特征选择、超参数搜索、阈值、早停、校准和
+模型选择路径不接收 primary 或敏感性 external。
+
+模型定型前不得输出 external 性能。每次最终评估记录模型工件、split manifest 哈希和时间，防止
+反复查看后人工调参。
+
+## 8. 数据概况和统计定义
+
+对 train、validation、primary external 和 tautomer-clean sensitivity external 报告：样本数和类别
+比例、来源/证据类型组成、分子量、Crippen LogP、TPSA、HBD/HBA、可旋转键、总环数、芳香环数、
+重原子数、Murcko scaffold 数和单例比例、到 train 最大 ECFP4 相似度及计算失败数。
+
+描述符输入统一为标准化 `parent_smiles`，固定调用：
+
+| 描述符 | RDKit 实现 |
+|---|---|
+| 分子量 | `Descriptors.MolWt(mol)` |
+| Crippen LogP | `Crippen.MolLogP(mol)` |
+| TPSA | `rdMolDescriptors.CalcTPSA(mol)` |
+| HBD | `rdMolDescriptors.CalcNumHBD(mol)` |
+| HBA | `rdMolDescriptors.CalcNumHBA(mol)` |
+| 可旋转键 | `rdMolDescriptors.CalcNumRotatableBonds(mol, strict=True)` |
+| 总环数 | `rdMolDescriptors.CalcNumRings(mol)` |
+| 芳香环数 | `rdMolDescriptors.CalcNumAromaticRings(mol)` |
+| 重原子数 | `mol.GetNumHeavyAtoms()` |
+
+解析或计算失败必须按 compound、split 和描述符记录，不能用 0 填充。函数、参数和 RDKit 版本进入
+输入指纹。
+
+### 8.1 描述统计
+
+- `std` 和方差使用总体定义 `ddof=0`；
+- 分位数为 P05/P25/P50/P75/P95，使用 NumPy `method="linear"`；
+- 连续变量输出 count、missing、mean、std、min、P05、P25、median、P75、P95、max；
+- 浮点缺失按第 10 节写为空字符串，不输出 NaN/Infinity。
+
+### 8.2 分布漂移
+
+validation 与 train、external 与 train 分别计算：
+
+```text
+SMD = (mean_comparison - mean_train) / sqrt((var_train + var_comparison) / 2)
+```
+
+方差使用 `ddof=0`。分母为零且均值相同则 SMD=0；分母为零且均值不同则 SMD 留空，并记录
+`smd_status=undefined_zero_variance`。
+
+双样本 KS 固定为 `scipy.stats.ks_2samp(alternative="two-sided", method="exact")`。
+
+来源组合与标签的列联表先删除边际和为零的行列，再使用
+`scipy.stats.chi2_contingency(correction=False)`；记录有效行列数。Cramér's V 使用未校正公式
+`sqrt(chi2 / (n * min(r-1,c-1)))`，分母为零时记 0。
+
+来源组合只从 `label_resolution_sources_json` 生成，不把跨角色或弱证据混入。任一来源组合样本数
+不少于 20 且纯度 `max(positive_rate, 1-positive_rate) >= 0.90`，或 Cramér's V ≥0.30 时，manifest
+标记 `source_label_confounding_warning=true`，但不改变标签和 split。
+
+SciPy、NumPy 和所有统计参数进入 runtime signature、输入指纹和测试。
+
+## 9. 单一 release 事务与审计
+
+### 9.1 目录和真相源
+
+dry-run：
+
+```text
+audits/dataset_assembly/<audit-run-id>/
+├── modeling/
+├── splits/
+├── reports/
+├── audit_manifest.json
+└── audit.log
+```
+
+正式 release：
+
+```text
+releases/dataset_assembly/<formal-run-id>/
+├── modeling/
+├── splits/
+├── reports/
+├── manifest.json
+└── formal.log
+
+releases/dataset_assembly/current_release.json
+```
+
+release 目录是唯一事务真相源。旧的 `data/modeling/v1/`、`data/splits/v1/` 和
+`reports/dataset_assembly/current/` 只能是由 current pointer 派生的只读便利链接或便利副本，不能
+用于审批、哈希核验或训练加载，也不能成为正式提交的事务组成部分。正式加载器必须解析
+`current_release.json` 并验证 manifest。
+
+### 9.2 原子提交协议
+
+1. 在与 release 根同一文件系统的临时目录完整生成 modeling、splits、reports；
+2. 校验 schema、文件集合、哈希、字节数和行数；
+3. 写完并关闭日志，`flush + fsync`，此后禁止追加；
+4. 生成 manifest；manifest 记录日志哈希，但不记录自身哈希；写完后 `flush + fsync`；
+5. `fsync` 所有子目录和临时 release 根；
+6. 将完整临时根原子 rename 为唯一 `<formal-run-id>`；目标已存在则失败；
+7. 生成小型临时 pointer，包含 release ID、相对路径和 manifest SHA-256；`flush + fsync` 后原子
+   `os.replace` 为 `current_release.json`，再 fsync 父目录；
+8. current pointer 不进入确定性 artifacts 哈希；便利链接/副本在 pointer 切换后派生，失败不影响
+   release 有效性。
+
+任何 reader 只会看到旧 pointer 或新 pointer，不会看到三个目录的新旧混合状态。
+
+### 9.3 Dry-run 与正式比较
+
+确定性 artifacts 是 modeling、splits 和 reports 中登记的 CSV/JSON；run-specific envelope 是
+manifest、日志和 current pointer。
+
+正式运行必须：
+
+- 先按 audit manifest 验证审计目录文件集合、artifact 哈希/行数和已关闭日志哈希；
+- 验证当前输入指纹、环境和参数与 audit 一致；
+- 重新生成全部确定性 artifacts，与批准 audit 逐文件比较集合、SHA-256、字节数和行数；
+- 正式 manifest 中的 input fingerprint、runtime signature、settings 和 artifact maps 与 audit 一致；
+- manifest/log 因 run-id、run type、审批关系和时间不同，不要求与 dry-run 同哈希。
+
+同一输入重跑时，所有确定性 artifacts 必须字节相同；run-specific envelope 可以不同。
+
+dry-run 也采用明确的封口顺序：全部确定性 artifacts 写完并校验后，先写完、关闭和 fsync
+`audit.log`，此后禁止追加；再生成记录日志哈希的 `audit_manifest.json`，manifest 不记录自身哈希；
+最后 fsync 审计目录。已存在的 audit run-id 目录不得覆盖或追加。
+
+### 9.4 Manifest 和输入指纹
 
 输入指纹至少覆盖：
 
-- `dataset-cleaning-v1` 对应的 Git commit 和正式 cleaning manifest；
-- 13 个 `data/processed/*.csv` 的路径、SHA-256 和行数；
-- 本策略文档、组装模块、入口脚本和全部相关测试；
-- 人工冲突决策文件（即使只有表头）；
-- split、相似度、scaffold、标签和 JSON 序列化参数；
-- Python、操作系统、机器架构、RDKit、InChI、NumPy、pandas、scikit-learn、SciPy 及其实现签名；
-- 随机种子和线程/并行设置。
+- `dataset-cleaning-v1` commit、正式 cleaning manifest 和 13 个 processed CSV 的哈希/行数；
+- 本策略、组装模块、入口脚本、schema registry 和全部相关测试；
+- 人工冲突决策文件；
+- 标签、结构、相似度、scaffold、split、统计和序列化参数；
+- Python、平台、架构、RDKit/InChI、NumPy、pandas、scikit-learn、SciPy 及实现签名；
+- 随机种子、线程和并行设置。
 
-运行 ID 使用 UTC 时间和输入指纹前缀。相同输入重跑允许 run-id 不同，但全部确定性 data/report
-artifacts 的哈希必须相同；manifest 和日志因包含运行上下文可以不同。
+manifest 至少记录 schema version、run-id/type、批准 audit、输入指纹、环境、settings、输入/输出/
+报告的 SHA-256/字节数/CSV 数据行数、各状态计数、split 分布、manual review 覆盖率和 external lock。
 
-### 8.3 Manifest
+manifest 不记录自身哈希。审计目录、release 和 manifest 不得出现用户主目录绝对路径或凭据。
 
-Manifest 至少记录：
+## 10. 字节级序列化规范
 
-- schema version、run-id、run type、批准的 audit run-id；
-- cleaning 冻结点、输入指纹和运行环境签名；
-- 每个输入、输出和报告的 SHA-256、字节数、CSV 行数；
-- 标签映射、冲突解析和 split 参数；
-- development/train/validation/external 的数量和类别分布；
-- 重复组、冲突组、排除项和泄漏关系计数；
-- external 锁定状态；
-- 人工审核文件及其哈希。
+所有确定性 artifact 统一使用：
 
-审计目录、正式目录和 manifest 中不得出现用户主目录绝对路径或凭据。
+### 10.1 CSV
 
-### 8.4 人工审核与正式提交
+- UTF-8，无 BOM；换行符只允许 LF；文件以一个 LF 结束；
+- 分隔符 `,`，quotechar `"`，`doublequote=True`，`quoting=csv.QUOTE_MINIMAL`；
+- 列顺序来自版本化 schema registry，缺列、多列和重复列均失败；
+- 行顺序使用第 10.3 节排序键；排序稳定且使用 Unicode code point 顺序；
+- 缺失值统一为空字符串；字符串不做 locale 变换；
+- 布尔值固定为小写 `true/false`；整数使用十进制且无千位符；
+- 有限浮点统一使用 Python `format(value, ".17g")`；`-0` 和 `-0.0` 规范为 `0`；
+- NaN 和正负 Infinity 禁止；按业务规则允许缺失时写空字符串；
+- CSV 行数指数据行数，不含表头。
 
-执行顺序固定为：
+### 10.2 JSON 与时间
+
+- JSON 编码 UTF-8、无 BOM，`sort_keys=True`、`ensure_ascii=False`、
+  `separators=(",", ":")`、`allow_nan=False`；
+- JSON 数组先按字段规定去重和排序；JSON 文件以一个 LF 结束；
+- CSV 内嵌 JSON 使用同一 compact 规范，不追加 LF；
+- run-specific 时间和人工审核时间固定 UTC `YYYY-MM-DDTHH:MM:SSZ`，不写小数秒；
+- 确定性 artifacts 不得包含生成时间、run-id 或绝对路径；`cleaning_run_id` 是冻结输入常量，可以
+  出现在确定性文件中。
+
+### 10.3 核心文件排序键
+
+| 文件 | 固定行排序键 |
+|---|---|
+| `records_all.csv` | `source_dataset, source_record_id, record_key` |
+| `compounds.csv` | `standardized_inchikey` |
+| `compound_role_resolutions.csv` | `compound_id, dataset_role`，角色顺序 development→external |
+| `compound_exclusions.csv` | `compound_id, dataset_role, exclusion_reason` |
+| `record_exclusions.csv` | `source_dataset, source_record_id, exclusion_reason` |
+| `duplicate_groups.csv` | `compound_id, dataset_role` |
+| `structure_relation_edges.csv` | `comparison_scope, compound_id_a, dataset_role_a, compound_id_b, dataset_role_b, relation_type` |
+| split CSV | `standardized_inchikey` |
+| fold CSV | `standardized_inchikey` |
+| `nearest_neighbors.csv` | `query_split, query_compound_id, nearest_split, nearest_compound_id` |
+| 其他 pair 报告 | `compound_id_a, compound_id_b` 后接报告特有键 |
+
+所有其他 artifact 必须在 schema registry 中声明完整 schema 和排序键后才能生成；不存在“沿用当前
+DataFrame 顺序”的输出。JSON object 的键顺序由 canonical JSON 规则确定。
+
+## 11. 正式核心 artifacts
+
+每个 audit/release 根下至少包含：
+
+```text
+modeling/records_all.csv
+modeling/compounds.csv
+modeling/compound_role_resolutions.csv
+modeling/compound_exclusions.csv
+modeling/record_exclusions.csv
+modeling/duplicate_groups.csv
+modeling/structure_relation_edges.csv
+
+splits/primary_reproduction/train.csv
+splits/primary_reproduction/validation.csv
+splits/primary_reproduction/train_tuning_cv_folds.csv
+splits/full_development_stratified_cv_folds.csv
+splits/full_development_scaffold_cv_folds.csv
+splits/external_test.csv
+splits/external_test_tautomer_clean_sensitivity.csv
+
+reports/label_conflicts.csv
+reports/cross_role_tautomer_overlaps.csv
+reports/label_discordant_near_neighbors.csv
+reports/nearest_neighbors.csv
+reports/split_summary.csv
+reports/source_label_crosstab.csv
+reports/descriptor_summary.csv
+reports/scaffold_summary.csv
+reports/similarity_summary.csv
+reports/distribution_shift.csv
+reports/leakage_audit.json
+reports/resolution_summary.json
+```
+
+可以增加报告，但必须先进入 schema registry、manifest 和确定性文件集合，不能产生未登记结果。
+
+## 12. 执行顺序与验收
+
+执行顺序：
 
 ```text
 测试
-→ dry-run
-→ 审查重复组、冲突、泄漏和分布报告
-→ 完成人工冲突决策
-→ 若任何输入变化则重新测试和 dry-run
-→ 批准最终 run-id
-→ 正式运行
-→ 逐文件哈希、行数和环境复核
+→ 首次 dry-run 和冲突候选表
+→ 完成 100% confirm_exclude 人工审核
+→ 重新测试和 dry-run
+→ 审查重复、结构关系、泄漏、split 和分布报告
+→ 批准最终 audit run-id
+→ 正式运行到单一 release 根
+→ 校验 pointer、manifest、逐文件哈希和行数
 → 独立审核
 → Git 提交
 → 标签 modeling-dataset-v1
 ```
 
-`modeling-dataset-v1` 必须指向包含正式 manifest 和报告的提交，不能移动或复用
-`dataset-cleaning-v1`。大文件若不提交 Git，必须由审计目录或发布存储保存同字节副本，并在 Git
-中保留哈希、行数、来源和精确重建命令。
+验收条件：
 
-## 9. 预期正式输出
+- [ ] 每条来源记录具有稳定唯一 `record_key` 并可追溯；
+- [ ] 每个有效标准键恰好一个 `compound_id`；
+- [ ] 每个 compound-role 的标签、结构、泄漏状态独立且合法；
+- [ ] 每个 exact duplicate group 有明确聚合结果；
+- [ ] 每条 structure relation edge 的两端不同，标签不可比时显式记录；
+- [ ] 全部确定性标签冲突已 100% 人工确认排除；
+- [ ] development/train/validation/primary external membership 和标签与阶段 1 完全一致；
+- [ ] 每个 eligible 主样本恰好属于一个主 split；
+- [ ] development 与 primary external 无 exact/connectivity overlap；
+- [ ] tautomer overlap 有报告和独立敏感性集；
+- [ ] fixed validation 和 external 均未参与调参；
+- [ ] 相同输入重跑的确定性 artifacts 哈希完全相同；
+- [ ] audit、正式 release、pointer、manifest、日志和篡改拒绝链完整；
+- [ ] 正式 release 通过独立审核并打 `modeling-dataset-v1` 标签。
 
-```text
-data/modeling/v1/records_all.csv
-data/modeling/v1/compounds_resolved.csv
-data/modeling/v1/excluded_conflicts.csv
+## 13. 实现前约束
 
-data/splits/v1/primary_reproduction_split/train.csv
-data/splits/v1/primary_reproduction_split/validation.csv
-data/splits/v1/primary_reproduction_split/stratified_cv_folds.csv
-data/splits/v1/robustness_scaffold_cv/scaffold_cv_folds.csv
-data/splits/v1/external_test.csv
-```
+本策略再次审查通过后才实现 schema 和代码。首次实现不得直接生成正式 release，应依次完成：
 
-除上述核心文件外，可以增加关系边表、人工审核候选表和诊断报告，但必须进入 manifest，不能产生
-未登记的临时结果。
+1. schema registry、受控枚举和序列化器；
+2. 三层数据模型、排除表和人工冲突模板；
+3. input fingerprint、audit dry-run 和单 release 事务骨架；
+4. duplicate groups、structure edges、泄漏和最近邻审计；
+5. primary split、三套 CV 和 tautomer sensitivity split；
+6. 描述统计、来源偏倚和分布漂移报告；
+7. external 加载保护；
+8. 确定性、非法状态、篡改、崩溃恢复、泄漏反例和端到端测试。
 
-## 10. v1 验收条件
-
-- [ ] 每个进入 split 的建模化合物恰好一个最终二分类标签；
-- [ ] 每个 `compound_id` 可确定性复算，重跑不变且全局唯一；
-- [ ] 每条来源记录都有唯一 `record_key`，可回溯至阶段 1 和原始来源；
-- [ ] 所有重复组都有显式分类和解析结果；
-- [ ] 所有明确标签冲突均经审核或排除，不使用静默多数投票；
-- [ ] 每个 `resolved + eligible` 样本恰好属于一个主 split，其他可解析结构不被强制划分；
-- [ ] train、validation、external test 无完整结构交叉；
-- [ ] development 与 external test 无 connectivity 交叉；
-- [ ] scaffold、近邻、activity cliff 和来源偏倚均有报告；
-- [ ] 固定输入和 seed 重跑得到完全相同的文件哈希；
-- [ ] external 未进入调参、特征选择、阈值、校准或模型选择；
-- [ ] dry-run、批准、正式提交和独立复核链条完整；
-- [ ] Manifest、报告、测试、Git 提交和 `modeling-dataset-v1` 标签齐全。
-
-## 11. 实现前待审查事项
-
-本稿确认后才实现组装和审计代码。首次实现不得直接生成正式数据，应先完成：
-
-1. 固定输出 schema 和受控枚举；
-2. 建立人工冲突决策空模板；
-3. 实现输入指纹、dry-run 和事务提交骨架；
-4. 实现来源级映射与 exact duplicate 解析；
-5. 实现结构关系、相似度和泄漏审计；
-6. 实现随机 split、分层 CV 和 scaffold CV；
-7. 实现数据概况报告和 external 加载保护；
-8. 补齐确定性、篡改拒绝、泄漏反例和端到端回归测试。
-
-本策略审查通过前，不运行 dataset assembly dry-run，也不创建 `data/modeling/v1/` 或
-`data/splits/v1/`。
+本策略通过前，不运行 dataset assembly dry-run，不创建 audit 或正式 release。
