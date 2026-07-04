@@ -1,0 +1,10 @@
+split,dimension,value,count
+train,label_binary,0,380
+train,label_binary,1,304
+train,source,cpdb,594
+train,source,cpdb|iris,89
+train,source,iris,1
+validation,label_binary,0,95
+validation,label_binary,1,77
+validation,source,cpdb,149
+validation,source,cpdb|iris,23

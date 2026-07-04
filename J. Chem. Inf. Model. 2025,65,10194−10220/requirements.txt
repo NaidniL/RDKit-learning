@@ -1,0 +1,23 @@
+# Reproduction baseline: Python 3.10
+# Versions explicitly stated by the paper:
+rdkit==2023.9.6
+tensorflow==2.17.0
+keras==3.4.1
+streamlit==1.46.0
+
+# Versions not reported in the paper; pinned here for reproducibility.
+numpy==1.26.4
+pandas==2.2.2
+scipy==1.13.1
+scikit-learn==1.5.1
+lightgbm==4.5.0
+shap==0.46.0
+imbalanced-learn==0.12.3
+joblib==1.4.2
+
+# Evaluation, interpretation, and application visualization.
+matplotlib==3.9.1
+seaborn==0.13.2
+plotly==5.23.0
+pillow==10.4.0
+

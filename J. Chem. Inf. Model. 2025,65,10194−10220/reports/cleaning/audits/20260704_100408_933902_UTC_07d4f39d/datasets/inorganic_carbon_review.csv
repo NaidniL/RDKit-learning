@@ -1,0 +1,81 @@
+source,source_chemical_id,casrn,name,raw_smiles,canonical_smiles,parent_smiles,standard_inchikey,connectivity_key,structure_category,standardization_notes,manual_review_decision,manual_review_reason,manual_reviewer,structure_provenance
+ccris,1037,141-53-7,"FORMIC ACID, SODIUM SALT",[Na+].[O-]C=O,O=C[O-].[Na+],O=CO,BDAGIHXWWSANSR-UHFFFAOYSA-N,BDAGIHXWWSANSR,inorganic_carbon_review,已移除对离子;疑似无机含碳小分子，需人工审核,,,,PubChem Substance; original depositor
+ccris,1124,74-87-3,METHYL CHLORIDE,ClC,CCl,CCl,NEHMKBQYUWJMIP-UHFFFAOYSA-N,NEHMKBQYUWJMIP,inorganic_carbon_review,疑似无机含碳小分子，需人工审核,,,,PubChem Substance; original depositor
+ccris,1205,75-52-5,NITROMETHANE,[O-][N+](=O)C,C[N+](=O)[O-],C[N+](=O)[O-],LYGJENNIWJXYER-UHFFFAOYSA-N,LYGJENNIWJXYER,inorganic_carbon_review,疑似无机含碳小分子，需人工审核,,,,PubChem Substance; original depositor
+ccris,136,593-70-4,CHLOROFLUOROMETHANE,ClCF,FCCl,FCCl,XWCDCDSDNJVCLO-UHFFFAOYSA-N,XWCDCDSDNJVCLO,inorganic_carbon_review,疑似无机含碳小分子，需人工审核,,,,PubChem Substance; original depositor
+ccris,137,67-66-3,CHLOROFORM,ClC(Cl)Cl,ClC(Cl)Cl,ClC(Cl)Cl,HEDRZPFGACZZDS-UHFFFAOYSA-N,HEDRZPFGACZZDS,inorganic_carbon_review,疑似无机含碳小分子，需人工审核,,,,PubChem Substance; original depositor
+ccris,205,334-88-3,DIAZOMETHANE,[N+](=[N-])=C,C=[N+]=[N-],C=[N+]=[N-],YXHKONLOYHBTNS-UHFFFAOYSA-N,YXHKONLOYHBTNS,inorganic_carbon_review,疑似无机含碳小分子，需人工审核,,,,PubChem Substance; original depositor
+ccris,2301,67-56-1,METHANOL,OC,CO,CO,OKKJLVBELUTLKV-UHFFFAOYSA-N,OKKJLVBELUTLKV,inorganic_carbon_review,疑似无机含碳小分子，需人工审核,,,,PubChem Substance; original depositor
+ccris,2478,302-15-8,METHYLHYDRAZINE SULFATE,S(O)([O-])(=O)=O.N([NH3+])C,CN[NH3+].O=S(=O)([O-])O,CNN,HDZGCSFEDULWCS-UHFFFAOYSA-N,HDZGCSFEDULWCS,inorganic_carbon_review,已移除对离子;疑似无机含碳小分子，需人工审核,,,,PubChem Substance; original depositor
+ccris,2508,74-89-5,METHYLAMINE,NC,CN,CN,BAVYZALUXZFZLV-UHFFFAOYSA-N,BAVYZALUXZFZLV,inorganic_carbon_review,疑似无机含碳小分子，需人工审核,,,,PubChem Substance; original depositor
+ccris,315,50-00-0,FORMALDEHYDE,O=C,C=O,C=O,WSFSSNUMVMOOMR-UHFFFAOYSA-N,WSFSSNUMVMOOMR,inorganic_carbon_review,疑似无机含碳小分子，需人工审核,,,,PubChem Substance; original depositor
+ccris,346,75-47-8,IODOFORM,IC(I)I,IC(I)I,IC(I)I,OKJPEAGHQZHRQV-UHFFFAOYSA-N,OKJPEAGHQZHRQV,inorganic_carbon_review,疑似无机含碳小分子，需人工审核,,,,PubChem Substance; original depositor
+ccris,3503,4384-81-0,SODIUM DIETHYLDITHIOCARBAMATE,[S-]C(=S)N.[Na+],NC(=S)[S-].[Na+],NC(=S)S,DKVNPHBNOWQYFE-UHFFFAOYSA-N,DKVNPHBNOWQYFE,inorganic_carbon_review,已移除对离子;疑似无机含碳小分子，需人工审核,,,,PubChem Substance; original depositor
+ccris,385,74-83-9,METHYL BROMIDE,BrC,CBr,CBr,GZUXJHMPEANEGY-UHFFFAOYSA-N,GZUXJHMPEANEGY,inorganic_carbon_review,疑似无机含碳小分子，需人工审核,,,,PubChem Substance; original depositor
+ccris,392,75-09-2,METHYLENE CHLORIDE,ClCCl,ClCCl,ClCCl,YMWUJEATGCHHMB-UHFFFAOYSA-N,YMWUJEATGCHHMB,inorganic_carbon_review,疑似无机含碳小分子，需人工审核,,,,PubChem Substance; original depositor
+ccris,394,60-34-4,METHYLHYDRAZINE,N(N)C,CNN,CNN,HDZGCSFEDULWCS-UHFFFAOYSA-N,HDZGCSFEDULWCS,inorganic_carbon_review,疑似无机含碳小分子，需人工审核,,,,PubChem Substance; original depositor
+ccris,395,74-88-4,METHYL IODIDE,IC,CI,CI,INQOMBQAUSQDDS-UHFFFAOYSA-N,INQOMBQAUSQDDS,inorganic_carbon_review,疑似无机含碳小分子，需人工审核,,,,PubChem Substance; original depositor
+ccris,3968,115-09-3,METHYLMERCURY CHLORIDE,[Hg](Cl)C,C[Hg]Cl,C[Hg]Cl,BABMCXWQNSQAOC-UHFFFAOYSA-M,BABMCXWQNSQAOC,inorganic_carbon_review,疑似无机含碳小分子，需人工审核,,,,PubChem Substance; original depositor
+ccris,4486,3031-73-0,METHYL HYDROPEROXIDE,O(O)C,COO,COO,MEUKEBNAABNAEX-UHFFFAOYSA-N,MEUKEBNAABNAEX,inorganic_carbon_review,疑似无机含碳小分子，需人工审核,,,,PubChem Substance; original depositor
+ccris,5269,593-51-1,METHYLAMINE HYDROCHLORIDE,[Cl-].[NH3+]C,C[NH3+].[Cl-],CN,BAVYZALUXZFZLV-UHFFFAOYSA-N,BAVYZALUXZFZLV,inorganic_carbon_review,已移除对离子;疑似无机含碳小分子，需人工审核,,,,PubChem Substance; original depositor
+ccris,588,62-56-6,THIOUREA,S=C(N)N,NC(N)=S,NC(N)=S,UMGDCJDMYOKAJW-UHFFFAOYSA-N,UMGDCJDMYOKAJW,inorganic_carbon_review,疑似无机含碳小分子，需人工审核,,,,PubChem Substance; original depositor
+ccris,6039,64-18-6,FORMIC ACID,OC=O,O=CO,O=CO,BDAGIHXWWSANSR-UHFFFAOYSA-N,BDAGIHXWWSANSR,inorganic_carbon_review,疑似无机含碳小分子，需人工审核,,,,PubChem Substance; original depositor
+ccris,6064,1184-57-2,METHYLMERCURY HYDROXIDE,[Hg+]C.[OH-],C[Hg+].[OH-],C[Hg+],DBUXSCUEGJMZAE-UHFFFAOYSA-N,DBUXSCUEGJMZAE,inorganic_carbon_review,已移除对离子;保留形式电荷+1;疑似无机含碳小分子，需人工审核,,,,PubChem Substance; original depositor
+ccris,6240,75-12-7,FORMAMIDE,O=CN,NC=O,NC=O,ZHNUHDYFZUAESO-UHFFFAOYSA-N,ZHNUHDYFZUAESO,inorganic_carbon_review,疑似无机含碳小分子，需人工审核,,,,PubChem Substance; original depositor
+ccris,7063,3425-46-5,POTASSIUM SELENOCYANATE,[Se-]C#N.[K+],N#C[Se-].[K+],N#C[SeH],CRDYSYOERSZTHZ-UHFFFAOYSA-N,CRDYSYOERSZTHZ,inorganic_carbon_review,已移除对离子;疑似无机含碳小分子，需人工审核,,,,PubChem Substance; original depositor
+ccris,7741,75-17-2,FORMALDOXIME,ON=C,C=NO,C=NO,SQDFHQJTAWCFIB-UHFFFAOYSA-N,SQDFHQJTAWCFIB,inorganic_carbon_review,疑似无机含碳小分子，需人工审核,,,,PubChem Substance; original depositor
+ccris,7813,409-21-2,SILICON CARBIDE,[SiH2+]#[C-],[C-]#[SiH2+],[C-]#[SiH2+],HBMJWWWQQXIZIP-UHFFFAOYSA-N,HBMJWWWQQXIZIP,inorganic_carbon_review,疑似无机含碳小分子，需人工审核,,,,PubChem Substance; original depositor
+ccris,8150,98114-62-6,POTASSIUM (E)-METHANEDIAZOTATE,[K+].[O-]C/N=N/[H],[H]/N=N/C[O-].[K+],[H]/N=N/CO,YAHQGPVDZBJVST-NSCUHMNNSA-N,YAHQGPVDZBJVST,inorganic_carbon_review,已移除对离子;疑似无机含碳小分子，需人工审核,,,,PubChem Substance; original depositor
+ccris,8151,92078-92-7,POTASSIUM (E)-ETHANEDIAZOTATE,O=[15N][15NH]C,C[15NH][15N]=O,C[15NH][15N]=O,CIJBKNZDKBKMFU-SUEIGJEOSA-N,CIJBKNZDKBKMFU,inorganic_carbon_review,疑似无机含碳小分子，需人工审核,,,,PubChem Substance; original depositor
+ccris,8154,3058-37-5,POTASSIUM (Z)-METHANEDIAZOTATE,[K+].[O-]C/N=N/[H],[H]/N=N/C[O-].[K+],[H]/N=N/CO,YAHQGPVDZBJVST-NSCUHMNNSA-N,YAHQGPVDZBJVST,inorganic_carbon_review,已移除对离子;疑似无机含碳小分子，需人工审核,,,,PubChem Substance; original depositor
+ccris,8155,94610-15-8,POTASSIUM (Z)-ETHANEDIAZOTATE,[K+].[O-]/N=N/C([2H])([2H])[2H],[2H]C([2H])([2H])/N=N/[O-].[K+],[2H]C([2H])([2H])NN=O,CIJBKNZDKBKMFU-FIBGUPNXSA-N,CIJBKNZDKBKMFU,inorganic_carbon_review,已移除对离子;已执行互变异构体规范化;疑似无机含碳小分子，需人工审核,,,,PubChem Substance; original depositor
+ccris,817,74-97-5,BROMOCHLOROMETHANE,BrCCl,ClCBr,ClCBr,JPOXNPPZZKNXOV-UHFFFAOYSA-N,JPOXNPPZZKNXOV,inorganic_carbon_review,疑似无机含碳小分子，需人工审核,,,,PubChem Substance; original depositor
+ccris,819,75-27-4,BROMODICHLOROMETHANE,BrC(Cl)Cl,ClC(Cl)Br,ClC(Cl)Br,FMWLUWPQPKEARP-UHFFFAOYSA-N,FMWLUWPQPKEARP,inorganic_carbon_review,疑似无机含碳小分子，需人工审核,,,,PubChem Substance; original depositor
+ccris,849,75-54-7,METHYLDICHLOROSILANE,Cl[Si](Cl)C,C[Si](Cl)Cl,C[Si](Cl)Cl,KTQYJQFGNYHXMB-UHFFFAOYSA-N,KTQYJQFGNYHXMB,inorganic_carbon_review,疑似无机含碳小分子，需人工审核,,,,PubChem Substance; original depositor
+ccris,8551,75-11-6,DIIODOMETHANE,ICI,ICI,ICI,NZZFYRREKKOMAT-UHFFFAOYSA-N,NZZFYRREKKOMAT,inorganic_carbon_review,疑似无机含碳小分子，需人工审核,,,,PubChem Substance; original depositor
+ccris,858,75-45-6,CHLORODIFLUOROMETHANE,ClC(F)F,FC(F)Cl,FC(F)Cl,VOPWNXZWBYDODV-UHFFFAOYSA-N,VOPWNXZWBYDODV,inorganic_carbon_review,疑似无机含碳小分子，需人工审核,,,,PubChem Substance; original depositor
+ccris,9102,5188-07-8,SODIUM METHYL MERCAPTAN,[S-]C.[Na+],C[S-].[Na+],CS,LSDPWZHWYPCBBB-UHFFFAOYSA-N,LSDPWZHWYPCBBB,inorganic_carbon_review,已移除对离子;疑似无机含碳小分子，需人工审核,,,,PubChem Substance; original depositor
+ccris,9323,25400-23-1,METHYLARSONOUS ACID,[As](O)(O)C,C[As](O)O,C[As](O)O,OXBIRPQQKCQWGV-UHFFFAOYSA-N,OXBIRPQQKCQWGV,inorganic_carbon_review,疑似无机含碳小分子，需人工审核,,,,PubChem Substance; original depositor
+ccris,938,124-48-1,CHLORODIBROMOMETHANE,BrC(Br)Cl,ClC(Br)Br,ClC(Br)Br,GATVIKZLVQHOMN-UHFFFAOYSA-N,GATVIKZLVQHOMN,inorganic_carbon_review,疑似无机含碳小分子，需人工审核,,,,PubChem Substance; original depositor
+ccris,939,74-95-3,DIBROMOMETHANE,BrCBr,BrCBr,BrCBr,FJBFPHVGVWTDIP-UHFFFAOYSA-N,FJBFPHVGVWTDIP,inorganic_carbon_review,疑似无机含碳小分子，需人工审核,,,,PubChem Substance; original depositor
+ccris,9466,7207-97-8,DIIODOMETHYLARSINE,I[As](I)C,C[As](I)I,C[As](I)I,ZKGSUVMABCXPKK-UHFFFAOYSA-N,ZKGSUVMABCXPKK,inorganic_carbon_review,疑似无机含碳小分子，需人工审核,,,,PubChem Substance; original depositor
+ccris,98,75-25-2,BROMOFORM,BrC(Br)Br,BrC(Br)Br,BrC(Br)Br,DIKBFYAXUHHXCS-UHFFFAOYSA-N,DIKBFYAXUHHXCS,inorganic_carbon_review,疑似无机含碳小分子，需人工审核,,,,PubChem Substance; original depositor
+ccris,989,57-13-6,UREA,O=C(N)N,NC(N)=O,NC(N)=O,XSQUKJJJFZCRTK-UHFFFAOYSA-N,XSQUKJJJFZCRTK,inorganic_carbon_review,疑似无机含碳小分子，需人工审核,,,,PubChem Substance; original depositor
+cpdb,bcm,75-27-4,BROMODICHLOROMETHANE,BrC(Cl)Cl,ClC(Cl)Br,ClC(Cl)Br,FMWLUWPQPKEARP-UHFFFAOYSA-N,FMWLUWPQPKEARP,inorganic_carbon_review,疑似无机含碳小分子，需人工审核,,,,PubChem Substance; original depositor
+cpdb,cdf,75-45-6,CHLORODIFLUOROMETHANE,ClC(F)F,FC(F)Cl,FC(F)Cl,VOPWNXZWBYDODV-UHFFFAOYSA-N,VOPWNXZWBYDODV,inorganic_carbon_review,疑似无机含碳小分子，需人工审核,,,,PubChem Substance; original depositor
+cpdb,cdm,124-48-1,CHLORODIBROMOMETHANE,BrC(Br)Cl,ClC(Br)Br,ClC(Br)Br,GATVIKZLVQHOMN-UHFFFAOYSA-N,GATVIKZLVQHOMN,inorganic_carbon_review,疑似无机含碳小分子，需人工审核,,,,PubChem Substance; original depositor
+cpdb,chf,67-66-3,CHLOROFORM,ClC(Cl)Cl,ClC(Cl)Cl,ClC(Cl)Cl,HEDRZPFGACZZDS-UHFFFAOYSA-N,HEDRZPFGACZZDS,inorganic_carbon_review,疑似无机含碳小分子，需人工审核,,,,PubChem Substance; original depositor
+cpdb,ci3,75-47-8,IODOFORM,IC(I)I,IC(I)I,IC(I)I,OKJPEAGHQZHRQV-UHFFFAOYSA-N,OKJPEAGHQZHRQV,inorganic_carbon_review,疑似无机含碳小分子，需人工审核,,,,PubChem Substance; original depositor
+cpdb,fc3,593-70-4,CHLOROFLUOROMETHANE,ClCF,FCCl,FCCl,XWCDCDSDNJVCLO-UHFFFAOYSA-N,XWCDCDSDNJVCLO,inorganic_carbon_review,疑似无机含碳小分子，需人工审核,,,,PubChem Substance; original depositor
+cpdb,for,50-00-0,FORMALDEHYDE,O=C,C=O,C=O,WSFSSNUMVMOOMR-UHFFFAOYSA-N,WSFSSNUMVMOOMR,inorganic_carbon_review,疑似无机含碳小分子，需人工审核,,,,PubChem Substance; original depositor
+cpdb,fyl,624-84-0,FORMYLHYDRAZINE,O=CNN,NNC=O,NNC=O,XZBIXDPGRMLSTC-UHFFFAOYSA-N,XZBIXDPGRMLSTC,inorganic_carbon_review,疑似无机含碳小分子，需人工审核,,,,PubChem Substance; original depositor
+cpdb,mbr,74-83-9,METHYL BROMIDE,BrC,CBr,CBr,GZUXJHMPEANEGY-UHFFFAOYSA-N,GZUXJHMPEANEGY,inorganic_carbon_review,疑似无机含碳小分子，需人工审核,,,,PubChem Substance; original depositor
+cpdb,meh,60-34-4,METHYLHYDRAZINE,N(N)C,CNN,CNN,HDZGCSFEDULWCS-UHFFFAOYSA-N,HDZGCSFEDULWCS,inorganic_carbon_review,疑似无机含碳小分子，需人工审核,,,,PubChem Substance; original depositor
+cpdb,mhs,302-15-8,METHYLHYDRAZINE SULFATE,S(O)([O-])(=O)=O.N([NH3+])C,CN[NH3+].O=S(=O)([O-])O,CNN,HDZGCSFEDULWCS-UHFFFAOYSA-N,HDZGCSFEDULWCS,inorganic_carbon_review,已移除对离子;疑似无机含碳小分子，需人工审核,,,,PubChem Substance; original depositor
+cpdb,mla,115-09-3,MERCURYMETHYL CHLORIDE,[Hg](Cl)C,C[Hg]Cl,C[Hg]Cl,BABMCXWQNSQAOC-UHFFFAOYSA-M,BABMCXWQNSQAOC,inorganic_carbon_review,疑似无机含碳小分子，需人工审核,,,,PubChem Substance; original depositor
+cpdb,myc,75-09-2,METHYLENE CHLORIDE,ClCCl,ClCCl,ClCCl,YMWUJEATGCHHMB-UHFFFAOYSA-N,YMWUJEATGCHHMB,inorganic_carbon_review,疑似无机含碳小分子，需人工审核,,,,PubChem Substance; original depositor
+cpdb,nim,75-52-5,NITROMETHANE,[O-][N+](=O)C,C[N+](=O)[O-],C[N+](=O)[O-],LYGJENNIWJXYER-UHFFFAOYSA-N,LYGJENNIWJXYER,inorganic_carbon_review,疑似无机含碳小分子，需人工审核,,,,PubChem Substance; original depositor
+cpdb,tbe,75-25-2,TRIBROMOMETHANE,BrC(Br)Br,BrC(Br)Br,BrC(Br)Br,DIKBFYAXUHHXCS-UHFFFAOYSA-N,DIKBFYAXUHHXCS,inorganic_carbon_review,疑似无机含碳小分子，需人工审核,,,,PubChem Substance; original depositor
+cpdb,tur,62-56-6,THIOUREA,S=C(N)N,NC(N)=S,NC(N)=S,UMGDCJDMYOKAJW-UHFFFAOYSA-N,UMGDCJDMYOKAJW,inorganic_carbon_review,疑似无机含碳小分子，需人工审核,,,,PubChem Substance; original depositor
+cpdb,ura,57-13-6,UREA,O=C(N)N,NC(N)=O,NC(N)=O,XSQUKJJJFZCRTK-UHFFFAOYSA-N,XSQUKJJJFZCRTK,inorganic_carbon_review,疑似无机含碳小分子，需人工审核,,,,PubChem Substance; original depositor
+iris,DTXSID0020868,75-09-2,Dichloromethane,C(Cl)Cl,ClCCl,ClCCl,YMWUJEATGCHHMB-UHFFFAOYSA-N,YMWUJEATGCHHMB,inorganic_carbon_review,疑似无机含碳小分子，需人工审核,,,,PubChem exact DTXSID lookup (EPA identifier)
+iris,DTXSID0021541,74-87-3,Methyl chloride,CCl,CCl,CCl,NEHMKBQYUWJMIP-UHFFFAOYSA-N,NEHMKBQYUWJMIP,inorganic_carbon_review,疑似无机含碳小分子，需人工审核,,,,PubChem exact DTXSID lookup (EPA identifier)
+iris,DTXSID0024008,334-88-3,Diazomethane,C=[N+]=[N-],C=[N+]=[N-],C=[N+]=[N-],YXHKONLOYHBTNS-UHFFFAOYSA-N,YXHKONLOYHBTNS,inorganic_carbon_review,疑似无机含碳小分子，需人工审核,,,,PubChem exact DTXSID lookup (EPA identifier)
+iris,DTXSID0024187,74-88-4,Methyl iodide,CI,CI,CI,INQOMBQAUSQDDS-UHFFFAOYSA-N,INQOMBQAUSQDDS,inorganic_carbon_review,疑似无机含碳小分子，需人工审核,,,,PubChem exact DTXSID lookup (EPA identifier)
+iris,DTXSID0024260,75-44-5,Phosgene,C(=O)(Cl)Cl,O=C(Cl)Cl,O=C(Cl)Cl,YGYAWVDWMABLBF-UHFFFAOYSA-N,YGYAWVDWMABLBF,inorganic_carbon_review,疑似无机含碳小分子，需人工审核,,,,PubChem exact DTXSID lookup (EPA identifier)
+iris,DTXSID1020198,75-27-4,Bromodichloromethane,C(Cl)(Cl)Br,ClC(Cl)Br,ClC(Cl)Br,FMWLUWPQPKEARP-UHFFFAOYSA-N,FMWLUWPQPKEARP,inorganic_carbon_review,疑似无机含碳小分子，需人工审核,,,,PubChem exact DTXSID lookup (EPA identifier)
+iris,DTXSID1020300,124-48-1,Dibromochloromethane,C(Cl)(Br)Br,ClC(Br)Br,ClC(Br)Br,GATVIKZLVQHOMN-UHFFFAOYSA-N,GATVIKZLVQHOMN,inorganic_carbon_review,疑似无机含碳小分子，需人工审核,,,,PubChem exact DTXSID lookup (EPA identifier)
+iris,DTXSID1020306,67-66-3,Chloroform,C(Cl)(Cl)Cl,ClC(Cl)Cl,ClC(Cl)Cl,HEDRZPFGACZZDS-UHFFFAOYSA-N,HEDRZPFGACZZDS,inorganic_carbon_review,疑似无机含碳小分子，需人工审核,,,,PubChem exact DTXSID lookup (EPA identifier)
+iris,DTXSID1021374,75-25-2,Bromoform,C(Br)(Br)Br,BrC(Br)Br,BrC(Br)Br,DIKBFYAXUHHXCS-UHFFFAOYSA-N,DIKBFYAXUHHXCS,inorganic_carbon_review,疑似无机含碳小分子，需人工审核,,,,PubChem exact DTXSID lookup (EPA identifier)
+iris,DTXSID1023992,460-19-5,Cyanogen,C(#N)C#N,N#CC#N,N#CC#N,JMANVNJQNLATNU-UHFFFAOYSA-N,JMANVNJQNLATNU,inorganic_carbon_review,疑似无机含碳小分子，需人工审核,,,,PubChem exact DTXSID lookup (EPA identifier)
+iris,DTXSID2021731,67-56-1,Methanol,CO,CO,CO,OKKJLVBELUTLKV-UHFFFAOYSA-N,OKKJLVBELUTLKV,inorganic_carbon_review,疑似无机含碳小分子，需人工审核,,,,PubChem exact DTXSID lookup (EPA identifier)
+iris,DTXSID2024115,64-18-6,Formic acid,C(=O)O,O=CO,O=CO,BDAGIHXWWSANSR-UHFFFAOYSA-N,BDAGIHXWWSANSR,inorganic_carbon_review,疑似无机含碳小分子，需人工审核,,,,PubChem exact DTXSID lookup (EPA identifier)
+iris,DTXSID4021426,57-13-6,Urea,C(=O)(N)N,NC(N)=O,NC(N)=O,XSQUKJJJFZCRTK-UHFFFAOYSA-N,XSQUKJJJFZCRTK,inorganic_carbon_review,疑似无机含碳小分子，需人工审核,,,,PubChem exact DTXSID lookup (EPA identifier)
+iris,DTXSID4021503,74-97-5,Bromochloromethane,C(Cl)Br,ClCBr,ClCBr,JPOXNPPZZKNXOV-UHFFFAOYSA-N,JPOXNPPZZKNXOV,inorganic_carbon_review,疑似无机含碳小分子，需人工审核,,,,PubChem exact DTXSID lookup (EPA identifier)
+iris,DTXSID4021551,506-77-4,Chlorine cyanide,C(#N)Cl,N#CCl,N#CCl,QPJDMGCKMHUXFD-UHFFFAOYSA-N,QPJDMGCKMHUXFD,inorganic_carbon_review,疑似无机含碳小分子，需人工审核,,,,PubChem exact DTXSID lookup (EPA identifier)
+iris,DTXSID4024303,630-10-4,Selenourea,C(=N)(N)[SeH],N=C(N)[SeH],NC(N)=[Se],IYKVLICPFCEZOF-UHFFFAOYSA-N,IYKVLICPFCEZOF,inorganic_carbon_review,已执行互变异构体规范化;疑似无机含碳小分子，需人工审核,,,,PubChem exact DTXSID lookup (EPA identifier)
+iris,DTXSID6020301,75-45-6,Chlorodifluoromethane,C(F)(F)Cl,FC(F)Cl,FC(F)Cl,VOPWNXZWBYDODV-UHFFFAOYSA-N,VOPWNXZWBYDODV,inorganic_carbon_review,疑似无机含碳小分子，需人工审核,,,,PubChem exact DTXSID lookup (EPA identifier)
+iris,DTXSID7020637,50-00-0,Formaldehyde,C=O,C=O,C=O,WSFSSNUMVMOOMR-UHFFFAOYSA-N,WSFSSNUMVMOOMR,inorganic_carbon_review,疑似无机含碳小分子，需人工审核,,,,PubChem exact DTXSID lookup (EPA identifier)
+iris,DTXSID8020832,74-83-9,Bromomethane,CBr,CBr,CBr,GZUXJHMPEANEGY-UHFFFAOYSA-N,GZUXJHMPEANEGY,inorganic_carbon_review,疑似无机含碳小分子，需人工审核,,,,PubChem exact DTXSID lookup (EPA identifier)
+iris,DTXSID9021550,506-68-3,Cyanogen bromide,C(#N)Br,N#CBr,N#CBr,ATDGTVJJHBUTRL-UHFFFAOYSA-N,ATDGTVJJHBUTRL,inorganic_carbon_review,疑似无机含碳小分子，需人工审核,,,,PubChem exact DTXSID lookup (EPA identifier)
+iris,DTXSID9024198,22967-92-6,Methylmercury (MeHg),C[Hg+],C[Hg+],C[Hg+],DBUXSCUEGJMZAE-UHFFFAOYSA-N,DBUXSCUEGJMZAE,inorganic_carbon_review,保留形式电荷+1;疑似无机含碳小分子，需人工审核,,,,PubChem exact DTXSID lookup (EPA identifier)

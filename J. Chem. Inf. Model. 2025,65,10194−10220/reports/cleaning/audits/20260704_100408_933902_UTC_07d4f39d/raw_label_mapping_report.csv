@@ -1,0 +1,261 @@
+source,label_raw,label_category,label_candidate,label_reason,count
+ccris,,excluded,,无致癌性试验记录,7795
+ccris,,uncertain,,无法映射的结果,4
+ccris,20% TUMOR INCIDENCE; 0.23 CARCINOMAS/RAT; IMMATURE RATS LESS SUSCEPTIBLE,uncertain,,无法映射的结果,1
+ccris,46% TUMOR INCIDENCE; 0.54 CARCINOMAS/RAT; MATURE RATS LESS SUSCEPTIBLE,uncertain,,无法映射的结果,1
+ccris,69% TUMOR INCIDENCE; 1.27 CARCINOMAS/RAT; MATURE RATS MORE SUSCEPTIBLE,uncertain,,无法映射的结果,1
+ccris,76% TUMOR INCIDENCE; 0.92 CARCINOMAS/RAT; IMMATURE RATS MORE SUSCEPTIBLE,uncertain,,无法映射的结果,1
+ccris,EQUIVOCAL,uncertain,,带限制性描述的结果,188
+ccris,"EQUIVOCAL; NONE OF THE TUMOR INCIDENCES REACHED STATISTICAL SIGNIFICANCE; FOR THE THYROID, THE INCREASE IN TUMORS WAS MINIMAL",uncertain,,带限制性描述的结果,1
+ccris,EQUIVOCAL; NONE OF THE TUMOR INCIDENCES REACHED STATISTICAL SIGNIFICANCE; IN SOME CASES THE INCREASES IN TUMORS WERE MINIMAL,uncertain,,带限制性描述的结果,1
+ccris,EQUIVOCAL; NTP SAYS MARGINAL INCREASE IN UTERINE TUMORS BUT P VALUES DID NOT REACH SIGNIFICANCE,uncertain,,带限制性描述的结果,1
+ccris,EQUIVOCAL; P=0.047 AT MEDIAN DOSE FOR HEMANGIOSARCOMA,uncertain,,带限制性描述的结果,1
+ccris,EQUIVOCAL; THYROID TUMORS DID NOT REACH STATISTICAL SIGNIFICANCE,uncertain,,带限制性描述的结果,1
+ccris,Equivocal,uncertain,,带限制性描述的结果,9
+ccris,Equivocal (based on reanalysis of histologic sections archived from a 1984 study). Authors note unusually low incidence in controls,uncertain,,带限制性描述的结果,1
+ccris,"Equivocal, CA DPR described results as providing marginal evidence of treatment effects",uncertain,,带限制性描述的结果,1
+ccris,"Equivocal, CA DPR noted rarity of the tumors but that MTD not achieved",uncertain,,带限制性描述的结果,1
+ccris,"Equivocal, incidence of lung tumors may be from UDMH.",uncertain,,带限制性描述的结果,1
+ccris,Equivocal; Mononuclear cell leukemia and histiocytic sarcoma incidences described by NTP as equivocal.,uncertain,,带限制性描述的结果,1
+ccris,Equivocal; Test material was 80% pure,uncertain,,带限制性描述的结果,2
+ccris,NEGATIVE,negative,negative,明确阴性白名单,2701
+ccris,NEGATIVE (0%  INCIDENCE),uncertain,negative,未纳入严格白名单的带方向结果,1
+ccris,NEGATIVE (BLADDER HYPERPLASIAS AND DYSPLASIAS OBSERVED),uncertain,negative,未纳入严格白名单的带方向结果,1
+ccris,NEGATIVE (BLADDER HYPERPLASIAS OBSERVED),uncertain,negative,未纳入严格白名单的带方向结果,2
+ccris,NEGATIVE FOR TUMORS BUT APOPTOSIS AND NECROSIS OBSERVED IN LIVER AT DOSES OF 500 PPM AND HIGHER,uncertain,negative,未纳入严格白名单的带方向结果,1
+ccris,NEGATIVE; ADENOMAS OF CLITORAL GLAND INCREASED SIGNIFICANTLY AT 2 HIGHEST DOSES,uncertain,negative,未纳入严格白名单的带方向结果,1
+ccris,NEGATIVE; INADEQUATE STUDY TO DETERMINE CARCINOGENIC ACTIVITY,uncertain,negative,带限制性描述的结果,1
+ccris,NEGATIVE; NTP REPORTS AS SOME EVIDENCE FOR THYROID BUT P VALUES ARE NOT STATISTICALLY SIGNIFICANT,uncertain,negative,带限制性描述的结果,1
+ccris,NEGATIVE; PROSTATE AND COLON TUMORS NOT ENHANCED; MULTIPLICITY OF ABERRANT CRYPT FOCI IN FEMALE OFFSPRING INCREASED,uncertain,negative,未纳入严格白名单的带方向结果,1
+ccris,Negative,negative,negative,明确阴性白名单,323
+ccris,Negative  (although incidence at highest dose exceeded historical controls). Conclusions of authors: Some evidence of carcinogenic activity.,uncertain,negative,带限制性描述的结果,1
+ccris,"Negative (1 stomach papilloma possibly treatment related; study details not given in source), Purity 99%",uncertain,negative,未纳入严格白名单的带方向结果,1
+ccris,"Negative (Although statistical significance was not obtained, the authors considered the gallbladder adenomas to be related to the chemical, which is a peroxisome proliferator-activated receptor alpha/gamma agonist. Slight increases in hepatocellular carcinoma and malignant lymphoma were within historical limits and considered not treatment-related.)",uncertain,negative,未纳入严格白名单的带方向结果,1
+ccris,"Negative (Authors describe as equivocal evidence based on epithelial neoplasms (2/49, 4/49, 4/50, 8/49) in preputial gland and adenoma or adenocarcinoma (0/42, 0/42, 0/40, 3/45) in mammary gland)",uncertain,negative,带限制性描述的结果,1
+ccris,"Negative (Authors describe as equivocal evidence based on stromal polyp (1/52, 7/50, 2/50, 5/50) in uterus)",uncertain,negative,带限制性描述的结果,1
+ccris,"Negative (Authors describe as equivocal evidence based on stromal polyp (2/51, 5/50, 6/50, 7/50) in uterus)",uncertain,negative,带限制性描述的结果,1
+ccris,Negative (CA DPR describes as possible adverse effect; study details not given in source),uncertain,negative,带限制性描述的结果,1
+ccris,Negative (Decreased incidence of spontaneous tumors),uncertain,negative,未纳入严格白名单的带方向结果,2
+ccris,"Negative (Hepatocellular neoplasms observed in matched study of male transgenic rasH2 mice exposed at  50, 150, and 200 mg.kg.day)",uncertain,negative,未纳入严格白名单的带方向结果,1
+ccris,"Negative (However, significantly greater increase in thyroid follicular cell hyperplasia at end of exposure period vs end of study; also significantly greater than untreated control group)",uncertain,negative,未纳入严格白名单的带方向结果,1
+ccris,"Negative (Hyperplasia only, no tumors)",uncertain,negative,未纳入严格白名单的带方向结果,1
+ccris,Negative (MTD may have been exceeded); Purity: 95-99%,uncertain,negative,未纳入严格白名单的带方向结果,2
+ccris,Negative (NTP describes as Equivocal),uncertain,negative,带限制性描述的结果,1
+ccris,Negative (NTP reports as some evidence based on increased incidences of hepatocellular adenoma in the 188 and 375 mg/kg groups),uncertain,negative,带限制性描述的结果,1
+ccris,Negative (Nonneoplastic and preneoplastic lesions observed in ovary/oviduct and uterus),uncertain,negative,未纳入严格白名单的带方向结果,1
+ccris,Negative (Nonneoplastic changes were observed),uncertain,negative,未纳入严格白名单的带方向结果,1
+ccris,Negative (Purity 97.7%; Study details not given in source),uncertain,negative,未纳入严格白名单的带方向结果,1
+ccris,Negative (Purity 97.7%; study details not given in source),uncertain,negative,未纳入严格白名单的带方向结果,1
+ccris,Negative (Purity >99%; study details not given in source),uncertain,negative,未纳入严格白名单的带方向结果,1
+ccris,Negative (Purity of 89%; Study details not given in source),uncertain,negative,未纳入严格白名单的带方向结果,1
+ccris,Negative (Purity of 90.7%; Study details not given in source),uncertain,negative,未纳入严格白名单的带方向结果,1
+ccris,Negative (Significant increase in hyperplasia observed in combined chemical group. Low survival rate complicates interpretation of study),uncertain,negative,未纳入严格白名单的带方向结果,1
+ccris,"Negative (Slight increase in incidence of various neoplasms (harderian gland, lungs, skin, spleen, tail, thymus, and uterus) in female transgenic rasH2 mice similarly exposed at 50, 150, and 250 mg/kg/day.)",uncertain,negative,未纳入严格白名单的带方向结果,1
+ccris,Negative (Slight increases in hemangiosarcoma (multiple organs) and mammary gland carcinoma were not considered treatment related.),uncertain,negative,未纳入严格白名单的带方向结果,1
+ccris,Negative (Study details not given in report) Purity 99.6%,uncertain,negative,未纳入严格白名单的带方向结果,1
+ccris,Negative (Study details not given in source) Purity 99.6%,uncertain,negative,未纳入严格白名单的带方向结果,3
+ccris,Negative (Study details not given in source; Purity 95.6%),uncertain,negative,未纳入严格白名单的带方向结果,2
+ccris,Negative (Study details not given in source; purity 83.3%),uncertain,negative,未纳入严格白名单的带方向结果,2
+ccris,Negative (Study details not given in source; purity 92-95%),uncertain,negative,未纳入严格白名单的带方向结果,2
+ccris,Negative (Study details not given in source; purity 94.5%),uncertain,negative,未纳入严格白名单的带方向结果,4
+ccris,Negative (Study details not given in source; purity 95.2%),uncertain,negative,未纳入严格白名单的带方向结果,2
+ccris,Negative (Study details not given in source; purity 95.6%),uncertain,negative,未纳入严格白名单的带方向结果,2
+ccris,Negative (Study details not given in source; purity 96.2%),uncertain,negative,未纳入严格白名单的带方向结果,3
+ccris,Negative (Study details not given in source; purity 96.7%),uncertain,negative,未纳入严格白名单的带方向结果,1
+ccris,Negative (Study details not given in source; purity 99%),uncertain,negative,未纳入严格白名单的带方向结果,2
+ccris,Negative (Study details not given in source; purity 99.5%),uncertain,negative,未纳入严格白名单的带方向结果,2
+ccris,Negative (Study details not given in source; purity 99.6%),uncertain,negative,未纳入严格白名单的带方向结果,2
+ccris,Negative (Study details not presented by DPR evaluator),uncertain,negative,未纳入严格白名单的带方向结果,2
+ccris,"Negative (hyperplasia only, no increase in tumors)",uncertain,negative,未纳入严格白名单的带方向结果,1
+ccris,"Negative (kidney, liver, lung, spleen, thymus, stomach and intestine examined); similar results in male Ogg1 knockout mouse.",uncertain,negative,未纳入严格白名单的带方向结果,1
+ccris,"Negative (kidney, liver, lung, spleen, thymus, stomach, and intestine examined); similar results in female Ogg1 knockout mouse.",uncertain,negative,未纳入严格白名单的带方向结果,1
+ccris,Negative (nonstatistical increase in hepatocellular adenomas),uncertain,negative,未纳入严格白名单的带方向结果,2
+ccris,"Negative, (DPR evaluator indicated inadequate justification of dose and too narrow a range with exposures at two lower doses not discrete.)",uncertain,negative,带限制性描述的结果,2
+ccris,"Negative. (Authors describe as equivocal evidence based on alveolar/bronchiolar adenoma (0/50, 0/50, 5/50, 2/50); alveolar/bronchiolar adenoma or carcinoma (combined) (0/50, 0/50, 5/50, 3/50))",uncertain,negative,带限制性描述的结果,1
+ccris,"Negative. (Authors describe as equivocal evidence based on incidence of histiocytic sarcoma (0/49, 1/50, 1/50, 4/50) in all organs)",uncertain,negative,带限制性描述的结果,1
+ccris,"Negative. (Authors describe as equivocal evidence based on incidence of mononuclear cell leukemia: (5/50, 11/50, 18/50, 15/50))",uncertain,negative,带限制性描述的结果,1
+ccris,"Negative. (Authors describe as equivocal evidence based on incidence of thymoma, benign or malignant (0/47, 0/43, 0/49, 2/48) in thymus and carcinoma (0/50, 0/50, 0/50, 2/50) in mammary gland)",uncertain,negative,带限制性描述的结果,1
+ccris,"Negative. (Authors describe findings as equivocal based on renal tubule adenoma (standard evaluation - 0/50, 1/50, 0/50, 2/50; standard and extended evaluations combined - 0/50, 2/50, 1/50, 3/50))",uncertain,negative,带限制性描述的结果,1
+ccris,"Negative. (Authors describe results as equivocal based on incidences of hepatocellular adenoma (6/50, 13/50, 6/50); hepatocellular carcinoma (1/50, 7/50, 2/50); and hepatocellular adenoma or carcinoma (7/50, 18/50, 8/50)",uncertain,negative,带限制性描述的结果,1
+ccris,Negative. (Possible increased incidence of skin fibrosarcomas in high dose females),uncertain,negative,未纳入严格白名单的带方向结果,1
+ccris,Negative. A 350 ppm group was terminated at study day 58 due to self-trauma and infection which also caused decreased survival rates in the 150 ppm group.,uncertain,negative,未纳入严格白名单的带方向结果,2
+ccris,Negative. According to DPR evaluator; original data not presented. Cholinesterase inhibition at highest dose,uncertain,negative,未纳入严格白名单的带方向结果,2
+ccris,Negative. Authors describe as equivocal evidence of carcinogenicity.,uncertain,negative,带限制性描述的结果,1
+ccris,Negative. Authors describe as some evidence of carcinogenicity.,uncertain,negative,带限制性描述的结果,1
+ccris,Negative. Conclusions of authors: No evidence of carcinogenic activity.,uncertain,negative,未纳入严格白名单的带方向结果,1
+ccris,Negative. DNA adducts observed in mammary gland DNA collected 24 hr after last dosing.,uncertain,negative,未纳入严格白名单的带方向结果,1
+ccris,Negative. Dose-related non-neoplastic nasal lesions were observed.,uncertain,negative,未纳入严格白名单的带方向结果,1
+ccris,Negative. Increased incidence of thyroid tumors judged by reviewers as equivocal evidence of oncogenic effect.,uncertain,negative,带限制性描述的结果,1
+ccris,Negative. Length of experiment may have been insufficient to express tumors.,uncertain,negative,未纳入严格白名单的带方向结果,1
+ccris,Negative. Parallel experiment in Hras128 rat line was conducted to determine bladder tumor incidence (10/27 in experimental animals vs 4/13 in controls; not statistically significant),uncertain,negative,未纳入严格白名单的带方向结果,1
+ccris,Negative. Positive trend but results do not reach statistical significance (NTP describes results as Equivocal),uncertain,negative,带限制性描述的结果,1
+ccris,"Negative. When synthetic solar light (SSL) at 0.3 and 0.6 the minimal erythema dose (MED) was also administered 5 d/wk, 4 hr/d for 40 wk, salicylic acid was photoprotective, reducing the carcinogenicity of 0.3 MED SSL.",uncertain,negative,未纳入严格白名单的带方向结果,4
+ccris,"Negative: Although only hyperplasia observed in wild-type mouse,  forestomach papillomas and squamous cell carcinomas were observed in low incidence in rasH2 animals.",uncertain,negative,未纳入严格白名单的带方向结果,1
+ccris,Negative: Purity 98.5%; Liver: Nonneoplastic liver lesions (eosinophilic cellular alteration and spongiosis hepatitis),uncertain,negative,未纳入严格白名单的带方向结果,2
+ccris,Negative: Purity 99.3%,uncertain,negative,未纳入严格白名单的带方向结果,1
+ccris,"Negative; Although only hyperplasia observed in wild-type mouse,  forestomach papillomas (significant) and squamous cell carcinomas (nonsignificant) were observed  in rasH2 animals.",uncertain,negative,未纳入严格白名单的带方向结果,1
+ccris,Negative; Decreased litter size and fertility rates at two highest doses,uncertain,negative,未纳入严格白名单的带方向结果,1
+ccris,Negative; Probable purity of 97-98%,uncertain,negative,未纳入严格白名单的带方向结果,2
+ccris,"Negative; Probable purity of 97-98% (There were probably 10 animals in each interim sacrifice, but the information is not given by CA DPR)",uncertain,negative,未纳入严格白名单的带方向结果,2
+ccris,Negative; Purity 88.35% (98% cis- and 2% trans-isomer),uncertain,negative,未纳入严格白名单的带方向结果,3
+ccris,Negative; Purity 92.5%,uncertain,negative,未纳入严格白名单的带方向结果,3
+ccris,Negative; Purity 92.7%,uncertain,negative,未纳入严格白名单的带方向结果,2
+ccris,Negative; Purity 93.3%,uncertain,negative,未纳入严格白名单的带方向结果,3
+ccris,Negative; Purity 93.5%,uncertain,negative,未纳入严格白名单的带方向结果,4
+ccris,Negative; Purity 95%,uncertain,negative,未纳入严格白名单的带方向结果,1
+ccris,Negative; Purity 97%,uncertain,negative,未纳入严格白名单的带方向结果,1
+ccris,"Negative; Purity 97.2%; Interim sacrifices of 10 additional animals/sex/dose at wks 13, 26, 52, 78",uncertain,negative,未纳入严格白名单的带方向结果,2
+ccris,Negative; Purity 97.8 and 99.8%,uncertain,negative,未纳入严格白名单的带方向结果,2
+ccris,Negative; Purity 98%,uncertain,negative,未纳入严格白名单的带方向结果,2
+ccris,Negative; Purity 98.3%,uncertain,negative,未纳入严格白名单的带方向结果,1
+ccris,"Negative; Purity 98.4%; Interim sacrifices of 10 additional animals/sex/dose at wks 26, 52, 78",uncertain,negative,未纳入严格白名单的带方向结果,2
+ccris,Negative; Purity = 87.2%,uncertain,negative,未纳入严格白名单的带方向结果,2
+ccris,"Negative; Purity = 92.7, 92.1%",uncertain,negative,未纳入严格白名单的带方向结果,2
+ccris,Negative; Purity was 94.5%,uncertain,negative,未纳入严格白名单的带方向结果,4
+ccris,Negative; Slight but not statistically elevated incidence of  total neoplastic tumors (adenomas and carcinomas) in high dose females,uncertain,negative,未纳入严格白名单的带方向结果,1
+ccris,Negative; Slight but not statistically elevated incidence of total neoplastic tumors (adenomas and carcinomas) in high dose females,uncertain,negative,未纳入严格白名单的带方向结果,1
+ccris,Negative; Test material was 80% pure,uncertain,negative,未纳入严格白名单的带方向结果,2
+ccris,Negative; nonneoplastic changes observed,uncertain,negative,未纳入严格白名单的带方向结果,1
+ccris,Negative; p value not significant (NTP reports as Equivocal Evidence),uncertain,negative,带限制性描述的结果,1
+ccris,ONLY 5% OF ANIMALS AT 4 WK TREATMENT DEVELOPED TUMORS,uncertain,,无法映射的结果,1
+ccris,ONLY ABOUT 5% DEVELOPED TUMORS,uncertain,,无法映射的结果,1
+ccris,POSITIVE,positive,positive,明确阳性白名单,3665
+ccris,POSITIVE (100%); NO TUMORS AT INJECTION SITE,uncertain,positive,未纳入严格白名单的带方向结果,2
+ccris,POSITIVE (15%),uncertain,positive,未纳入严格白名单的带方向结果,1
+ccris,POSITIVE (5% INCIDENCE),uncertain,positive,未纳入严格白名单的带方向结果,1
+ccris,POSITIVE (85%),uncertain,positive,未纳入严格白名单的带方向结果,1
+ccris,POSITIVE (AT HIGHER DOSAGE AND LONGER DURATION),uncertain,positive,未纳入严格白名单的带方向结果,1
+ccris,POSITIVE (P = 0.052); NTP REPORTS AS SOME EVIDENCE,uncertain,positive,带限制性描述的结果,1
+ccris,POSITIVE ; MARGINAL BUT NOT SIGNIFICANT INCREASES OF HEMANGIOSARCOMAS OCCURRED IN THE UTERUS AND SKIN,uncertain,positive,带限制性描述的结果,1
+ccris,POSITIVE AT HIGHER DOSES,uncertain,positive,未纳入严格白名单的带方向结果,1
+ccris,POSITIVE IN MALES ONLY,uncertain,positive,未纳入严格白名单的带方向结果,1
+ccris,POSITIVE- TUMOR INCIDENCE 30-100%,uncertain,positive,未纳入严格白名单的带方向结果,1
+ccris,POSITIVE; (STATISTICALLY SIGNIFICANT FOR TOTAL NUMBER OF TUMORS),uncertain,positive,未纳入严格白名单的带方向结果,1
+ccris,POSITIVE; 27% INCIDENCE,uncertain,positive,未纳入严格白名单的带方向结果,1
+ccris,POSITIVE; ALL ANIMALS GIVEN 20 MG/KG DIED,uncertain,positive,未纳入严格白名单的带方向结果,1
+ccris,POSITIVE; ALMOST 80% INCIDENCE,uncertain,positive,未纳入严格白名单的带方向结果,1
+ccris,"POSITIVE; ALPHA-2U-GLOBULIN, INCIDENCES OF RENAL TUBULE REGENERATION AND GRANULAR CASTS IN MEDULLA AND DOSE-RELATED INCREASE IN SEVERITY OF HYALINE DROPLETS IN MALE RATS",uncertain,positive,未纳入严格白名单的带方向结果,1
+ccris,"POSITIVE; DUE TO MORTALITY, EXPOSURE IN 150 MG/L GROUP TERMINATED ON DAY 443",uncertain,positive,未纳入严格白名单的带方向结果,1
+ccris,POSITIVE; HIGHEST DOSE ONLY,uncertain,positive,未纳入严格白名单的带方向结果,2
+ccris,POSITIVE; INADEQUATE STUDY TO DETERMINE CARCINOGENIC ACTIVITY,uncertain,positive,带限制性描述的结果,1
+ccris,POSITIVE; INCIDENCE OF TUMORS WAS STATISTICALLY SIGNIFICANT,uncertain,positive,未纳入严格白名单的带方向结果,1
+ccris,POSITIVE; LEAN RATS HAD LONGER LATENT PERIOD AND LOWER TUMOR INCIDENCE THAN OBESE RATS,uncertain,positive,未纳入严格白名单的带方向结果,1
+ccris,"POSITIVE; NO TRUE DOSE RESPONSE, P VALUES = 0.01 IN THESE 2 CASES; ALL OTHERS NOT SIGNIFICANT",uncertain,positive,带限制性描述的结果,1
+ccris,POSITIVE; OBESE RATS HAD HIGHER TUMOR INCIDENCE AND SHORTER LATENT PERIOD THAN LEAN RATS,uncertain,positive,未纳入严格白名单的带方向结果,1
+ccris,"POSITIVE; P VALUES AT 2 HIGHER LEVELS SIGNIFICANT, KIDNEY TUMORS INCREASED BUT NOT SIGNIFICANT",uncertain,positive,带限制性描述的结果,1
+ccris,POSITIVE; RESPONSE ABOUT 30%,uncertain,positive,未纳入严格白名单的带方向结果,1
+ccris,POSITIVE; RESPONSE OF APPROXIMATELY 25% WITH 2 DOSES TO ALMOST 100%  AT 4 OR 8 DOSES,uncertain,positive,未纳入严格白名单的带方向结果,1
+ccris,Positive,positive,positive,明确阳性白名单,84
+ccris,Positive  (Study details not given in source; purity 96.7%),uncertain,positive,未纳入严格白名单的带方向结果,1
+ccris,"Positive (10,000 ppm group) (Purity of 90.7%; Study details n ot given in source)",uncertain,positive,未纳入严格白名单的带方向结果,1
+ccris,Positive (80% incidence). Apparent lack of concurrent controls.,uncertain,positive,未纳入严格白名单的带方向结果,1
+ccris,Positive (At highest dose only); CA DPR describes as a possible adverse effect,uncertain,positive,带限制性描述的结果,1
+ccris,Positive (At highest dose),uncertain,positive,未纳入严格白名单的带方向结果,1
+ccris,Positive (Authors describe as clear evidence),uncertain,positive,未纳入严格白名单的带方向结果,2
+ccris,Positive (CA DPR describes as possible adverse effect; study details not given in source),uncertain,positive,带限制性描述的结果,1
+ccris,Positive (CA Department of Pesticide Regulation evaluator described as a possible adverse effect),uncertain,positive,带限制性描述的结果,1
+ccris,Positive (Dose related metastasis of liver tumors to lung),uncertain,positive,未纳入严格白名单的带方向结果,1
+ccris,Positive (Evaluated as adverse effect by CA DPR; study details not given in source; purity 97.7%,uncertain,positive,未纳入严格白名单的带方向结果,1
+ccris,Positive (High dose only; study details not given in source),uncertain,positive,未纳入严格白名单的带方向结果,2
+ccris,Positive (Highest dose),uncertain,positive,未纳入严格白名单的带方向结果,3
+ccris,Positive (Historical controls only; reported incidence of liver tumors <2% at 2 yrs of age),uncertain,positive,未纳入严格白名单的带方向结果,1
+ccris,"Positive (However, no lung adenomas or forestomach papillomas found. Parp-1 deficiency (Parp-1-/- or Parp-1+/-) did not affect susceptibility of the mice to IQ carcinogenicity)",uncertain,positive,未纳入严格白名单的带方向结果,1
+ccris,Positive (Malignant mesothelioma) (NTP reports as Some Evidence); Mononuclear cell leukemia results described by NTP as equivocal.,uncertain,positive,带限制性描述的结果,1
+ccris,Positive (NTP describes as Clear Evidence),uncertain,positive,未纳入严格白名单的带方向结果,3
+ccris,Positive (NTP describes as Some Evidence),uncertain,positive,带限制性描述的结果,4
+ccris,Positive (NTP describes as Some Evidence); NTP describes results in liver as equivocal evidence,uncertain,positive,带限制性描述的结果,1
+ccris,Positive (NTP reports as Clear Evidence),uncertain,positive,未纳入严格白名单的带方向结果,3
+ccris,Positive (NTP reports as Some Evidence),uncertain,positive,带限制性描述的结果,1
+ccris,"Positive (NTP reports as Some Evidence; Findings in lung, pancreas, and uterus described as equivocal.)",uncertain,positive,带限制性描述的结果,1
+ccris,Positive (No lung adenomas or forestomach papillomas found). Parp-1 deficiency (Parp-1-/- or Parp-1+/-) did not affect susceptibility of the mice to IQ carcinogenicity.,uncertain,positive,未纳入严格白名单的带方向结果,1
+ccris,Positive (Only at highest dose),uncertain,positive,未纳入严格白名单的带方向结果,1
+ccris,Positive (Purity 99.3%; Study details not given in source; MTD may have been exceeded),uncertain,positive,未纳入严格白名单的带方向结果,1
+ccris,Positive (Purity 99.3%; Study details not given in source; Neoplastic lesions could not be duplicated in a study using p53 knockout mice; Bigot-Lasserre et al; Fd Chem Toxicol 14 (2003) 99-106),uncertain,positive,未纳入严格白名单的带方向结果,1
+ccris,Positive (Purity >99%; study details not given in source),uncertain,positive,未纳入严格白名单的带方向结果,1
+ccris,Positive (Purity of 89%; Study details  not given in source),uncertain,positive,未纳入严格白名单的带方向结果,1
+ccris,Positive (Results not described separately for each sex),uncertain,positive,未纳入严格白名单的带方向结果,1
+ccris,Positive (Significant increase at all dose levels at PND 50; significant at 2.5 ug at PND 95,uncertain,positive,未纳入严格白名单的带方向结果,1
+ccris,Positive (Significant increase in tumor incidence and multiplicity in knockout mice administered carcinogen compared to knockout controls and carcinogen-treated wild type mice),uncertain,positive,未纳入严格白名单的带方向结果,1
+ccris,Positive (Study details not given in source),uncertain,positive,未纳入严格白名单的带方向结果,4
+ccris,Positive (Study details not given in source) Purity 99%,uncertain,positive,未纳入严格白名单的带方向结果,1
+ccris,Positive (Study details not given in source; purity 96.2%),uncertain,positive,未纳入严格白名单的带方向结果,1
+ccris,Positive (Weak response),uncertain,positive,带限制性描述的结果,1
+ccris,Positive (as evaluated by CA DPR; study details not given in source; purity 97.7%,uncertain,positive,未纳入严格白名单的带方向结果,1
+ccris,Positive (for lymphoma only at high does) (NTP describes results as Some Evidence),uncertain,positive,带限制性描述的结果,1
+ccris,Positive (some of the p values do not reach significance.) Authors describe as clear evidence.,uncertain,positive,未纳入严格白名单的带方向结果,1
+ccris,Positive (statistically significant only at 25 mg/kg dose) (NTP describes as Some Evidence),uncertain,positive,带限制性描述的结果,1
+ccris,Positive (statistically significant trend but not incidence); Purity 97%,uncertain,positive,未纳入严格白名单的带方向结果,1
+ccris,Positive (surviving offspring exhibited 100% incidence with multiplicity of approximately 15; offspring exposed only in utero had greater lung tumor multiplicity than those exposed only through nursing). Breeding to provide litters comprised of half ahr(b-1/d) and half ahr (d/d) siblings,uncertain,positive,未纳入严格白名单的带方向结果,1
+ccris,"Positive Trend (not statistically significant); For stop study vs. controls, incidence in liver, lung and uterus same as controls. NTP reports results as some evidence.",uncertain,positive,带限制性描述的结果,1
+ccris,Positive Trend for Renal tubule adenoma (NTP describes as Some Evidence); Mononuclear cell leukemia findings described by NTP as equivocal,uncertain,positive,带限制性描述的结果,1
+ccris,Positive at 0.4 mg/cu m only; Negative for lung tumors. Authors noted that these results were replicated in studies of nickel sulfate,uncertain,positive,未纳入严格白名单的带方向结果,1
+ccris,Positive at 0.4 mg/cu m only; Negative for lung tumors. Increase in pheochromocytomas was within the range for historical controls,uncertain,positive,未纳入严格白名单的带方向结果,1
+ccris,Positive at high dose only; Purity 94.4%,uncertain,positive,未纳入严格白名单的带方向结果,1
+ccris,Positive at highest dose (CA DPR describes as possible adverse effect; study details not given in source),uncertain,positive,带限制性描述的结果,1
+ccris,Positive at the high dose level (Purity 99%; Study details not given in source),uncertain,positive,未纳入严格白名单的带方向结果,1
+ccris,"Positive but at 2 lower doses, there was a negative trend for the mammary tumors (NTP describes the results as Some Evidence)",uncertain,positive,带限制性描述的结果,1
+ccris,Positive for malignant tumors only (p=0.02). DNA adducts observed in mammary gland DNA collected 24 hr after last dosing.,uncertain,positive,未纳入严格白名单的带方向结果,1
+ccris,Positive trend (not statistically significant) (NTP reports as Some Evidence),uncertain,positive,带限制性描述的结果,1
+ccris,Positive without dose response (CA DPR describes as possible adverse effect); study details not given in report,uncertain,positive,带限制性描述的结果,1
+ccris,"Positive, (Neither tumor type, alone, was statistically significant.)",uncertain,positive,未纳入严格白名单的带方向结果,1
+ccris,"Positive, Authors describe as clear evidence of carcinogenic activity",uncertain,positive,未纳入严格白名单的带方向结果,4
+ccris,"Positive, Authors described results as clear evidence of carcinogenic activity",uncertain,positive,未纳入严格白名单的带方向结果,1
+ccris,"Positive, Authors described results as equivocal evidence of carcinogenic activity",uncertain,positive,带限制性描述的结果,1
+ccris,"Positive, Muraglitazar reported to be a peroxisome proliferator-activated receptor alpha/gamma agonist.",uncertain,positive,未纳入严格白名单的带方向结果,1
+ccris,"Positive, Positive trend; significant increase in high dose group; exposure levels well above industrial exposures.",uncertain,positive,未纳入严格白名单的带方向结果,1
+ccris,"Positive, low incidence of benign tumors.",uncertain,positive,未纳入严格白名单的带方向结果,2
+ccris,Positive. (Authors describe as clear evidence),uncertain,positive,未纳入严格白名单的带方向结果,3
+ccris,Positive. (CA Department of Pesticide Regulation reviewer evaluates as a possible adverse effect.),uncertain,positive,带限制性描述的结果,3
+ccris,Positive. (Department of Pesticides Regulation reviewer described as a possible adverse effect.),uncertain,positive,带限制性描述的结果,1
+ccris,Positive. (Department of Pesticides Regulation reviewer describes as a possible adverse effect.),uncertain,positive,带限制性描述的结果,1
+ccris,Positive. (Department of Pesticides Regulation reviewer describes as possible adverse effect),uncertain,positive,带限制性描述的结果,1
+ccris,Positive. Authors describe as clear evidence,uncertain,positive,未纳入严格白名单的带方向结果,2
+ccris,Positive. Authors describe as clear evidence of carcinogenicity based on increased incidences of alveolar/bronchiolar neoplasms. Increased incidences of hepatocellular adenoma or carcinoma (combined) were also considered to be compound-related.,uncertain,positive,未纳入严格白名单的带方向结果,1
+ccris,Positive. Authors describe as clear evidence of carcinogenicity based on increased incidences of alveolar/bronchiolar neoplasms. The increased incidences of hemangiosarcoma in the spleen and follicular cell adenoma in the thyroid gland may have been related to cumene exposure.,uncertain,positive,未纳入严格白名单的带方向结果,1
+ccris,Positive. Authors describe as clear evidence of carcinogenicity except that testicular tumors were considered equivocal.,uncertain,positive,带限制性描述的结果,1
+ccris,Positive. Authors describe as clear evidence.,uncertain,positive,未纳入严格白名单的带方向结果,1
+ccris,Positive. Conclusions of authors: Some evidence of carcinogenic activity based on increased incidences of nasal respiratory epithelial adenoma; increased incidences of Harderian gland adenoma may have been related to exposure).,uncertain,positive,带限制性描述的结果,1
+ccris,Positive. Conclusions of authors: Some evidence of carcinogenic activity.,uncertain,positive,带限制性描述的结果,1
+ccris,Positive. Dose-related non-neoplastic nasal lesions also observed.,uncertain,positive,未纳入严格白名单的带方向结果,1
+ccris,"Positive. In ancillary experiments, DNA damage was observed as early as 1 day after MNU injection; initial genomic instability was accompanied by a population of highly aneuploid cells.50 days post NMU treatment",uncertain,positive,未纳入严格白名单的带方向结果,1
+ccris,Positive. Study primarily directed to urine characteristics.,uncertain,positive,未纳入严格白名单的带方向结果,1
+ccris,Positive: Purity 95%,uncertain,positive,未纳入严格白名单的带方向结果,1
+ccris,Positive: Purity 99.3%,uncertain,positive,未纳入严格白名单的带方向结果,1
+ccris,Positive; CA DPR judged the study as showing possible adverse effects,uncertain,positive,带限制性描述的结果,2
+ccris,Positive; DPR reviewer notes that only 1 case of mucinous carcinoma has been seen in historical controls from 12 studies evaluated,uncertain,positive,未纳入严格白名单的带方向结果,1
+ccris,Positive; Decreased litter size and fertility rates at two highest doses,uncertain,positive,未纳入严格白名单的带方向结果,1
+ccris,Positive; Findings in pancreas and in liver for hepatocholangioma and cholangioma considered equivocal by NTP,uncertain,positive,带限制性描述的结果,1
+ccris,Positive; Purity 88.35% (98% cis- and 2% trans-isomer),uncertain,positive,未纳入严格白名单的带方向结果,1
+ccris,Positive; Purity 93.3%,uncertain,positive,未纳入严格白名单的带方向结果,1
+ccris,Positive; Purity 94.4%,uncertain,positive,未纳入严格白名单的带方向结果,1
+ccris,Positive; Purity 98.3%,uncertain,positive,未纳入严格白名单的带方向结果,1
+ccris,Positive; Purity 99%; Additional study details in California EPA Department of Pesticide Regulation Risk Characterization Document RCD-99-01,uncertain,positive,未纳入严格白名单的带方向结果,2
+ccris,Positive; statistically significant only at top dose. (NTP describes as Some Evidence),uncertain,positive,带限制性描述的结果,1
+ccris,SIGNIFICANT IN MALES AT 1500 PPB ONLY,uncertain,,无法映射的结果,1
+ccris,"Urinary bladder: Carcinoma, 63.0% in Nrf2-/- mice, 75.8% in p53+/- mice, 89.6% in Nrf2-/-::p53 +/- mice, and 37.9% in wild-type mice. Muscle: Invasive carcinoma, 38.0% in p53 +/-mice, 3.7% in Nrf2-/- mice, 62.0% in Nrf2 -/-::p53+/- mice, 6.9% in wild-type mice",uncertain,,无法映射的结果,1
+ccris,negative,negative,negative,明确阴性白名单,1
+cpdb,+,positive,positive,明确阳性,3931
+cpdb,-,negative,negative,明确阴性,6036
+cpdb,0,uncertain,,实验证据不足,181
+cpdb,0,uncertain,,无明确判断,10560
+cpdb,a,uncertain,positive,提示性阳性证据,106
+cpdb,c,positive,positive,明确阳性,1720
+cpdb,e,uncertain,,证据不明确,269
+cpdb,p,uncertain,positive,提示性阳性证据,200
+iris,,uncertain,,无法二分类或证据权重不足,308
+iris,A (Human carcinogen),positive,positive,明确人类致癌物,7
+iris,B1 (Probable human carcinogen - based on limited evidence of carcinogenicity in humans),uncertain,positive,较弱的阳性证据权重,4
+iris,B2 (Probable human carcinogen - based on sufficient evidence of carcinogenicity in animals),uncertain,positive,较弱的阳性证据权重,59
+iris,C (Possible human carcinogen),uncertain,positive,较弱的阳性证据权重,34
+iris,Carcinogenic potential cannot be determined,uncertain,,无法二分类或证据权重不足,13
+iris,Carcinogenic to humans,positive,positive,明确人类致癌物,8
+iris,D (Not classifiable as to human carcinogenicity),uncertain,,无法二分类或证据权重不足,93
+iris,Data are inadequate for an assessment of human carcinogenic potential,uncertain,,无法二分类或证据权重不足,12
+iris,E (Evidence of non-carcinogenicity for humans),negative,negative,明确人类非致癌物,3
+iris,Inadequate information to assess carcinogenic potential,uncertain,,无法二分类或证据权重不足,30
+iris,Known/likely human carcinogen,uncertain,positive,较弱的阳性证据权重,7
+iris,Likely to be carcinogenic to humans,uncertain,positive,较弱的阳性证据权重,16
+iris,"Not applicable.  This substance was not assessed using the 1986 cancer guidelines (U.S. EPA, 1986).",uncertain,,无法二分类或证据权重不足,1
+iris,Not likely to be carcinogenic to humans,uncertain,negative,存在暴露途径或剂量条件的阴性候选,7
+iris,Suggestive evidence of carcinogenic potential,uncertain,positive,较弱的阳性证据权重,7
+iris,"Suggestive evidence of carcinogenicity, but not sufficient to assess human carcinogenic potential",uncertain,positive,较弱的阳性证据权重,1
