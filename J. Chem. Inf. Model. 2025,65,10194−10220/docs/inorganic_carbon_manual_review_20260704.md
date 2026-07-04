@@ -3,9 +3,19 @@
 本清单来自审计批次 `20260704_100408_933902_UTC_07d4f39d`。原报告含 80 条来源记录，
 按 `standard_inchikey` 合并后为 44 个唯一结构。
 
-下表的“预审建议”只用于帮助人工排序，不是正式决策，也尚未写入
-`data/manual/inorganic_carbon_decisions.csv`。审核人需将“最终决策”填为 `include` 或 `exclude`，
-并填写理由和审核人。证据统计格式为 `P/N/U/X`，分别表示阳性、阴性、不确定和排除来源记录数。
+下表的“预审建议”用于保留决策前的审核记录。用户已完成最终决策：指定 6 个结构为
+`exclude`，其余 38 个为 `include`，并已写入 `data/manual/inorganic_carbon_decisions.csv`。
+本表中原有的空白“最终决策”列不再作为机器可读的决策源；以上 CSV 为唯一正式输入。
+证据统计格式为 `P/N/U/X`，分别表示阳性、阴性、不确定和排除来源记录数。
+
+### 用户指定的 6 个排除结构
+
+1. `ATDGTVJJHBUTRL-UHFFFAOYSA-N` — Cyanogen bromide
+2. `CRDYSYOERSZTHZ-UHFFFAOYSA-N` — Potassium selenocyanate
+3. `JMANVNJQNLATNU-UHFFFAOYSA-N` — Cyanogen
+4. `LSDPWZHWYPCBBB-UHFFFAOYSA-N` — Sodium methyl mercaptan
+5. `QPJDMGCKMHUXFD-UHFFFAOYSA-N` — Chlorine cyanide
+6. `YGYAWVDWMABLBF-UHFFFAOYSA-N` — Phosgene
 
 ## 审核表
 
@@ -61,7 +71,7 @@
 - 建议纳入：27 个。
 - 建议排除：5 个。
 - 重点复核：12 个。
-- 最终决策已填：0 个。
+- 用户最终决策：`include` 38 个，`exclude` 6 个，共 44 个。
 
 ## 建议的审核顺序
 
