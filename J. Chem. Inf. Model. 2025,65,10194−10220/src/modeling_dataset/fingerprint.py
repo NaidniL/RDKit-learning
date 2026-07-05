@@ -15,20 +15,20 @@ from typing import Any, Callable, Mapping, cast
 from .serialization import canonical_json, digest_file
 
 
-POLICY_SHA256 = "e76944360607618039377fee43a24cae07a55255392d74bf35a8320f1ee8dda8"
+POLICY_SHA256 = "11fc682604a1f9abef1fcca09f41050b482544869a86521d556355acf694c2c5"
 POLICY_PATH = "docs/modeling_dataset_policy.md"
 POLICY_SHA_PATH = "docs/modeling_dataset_policy.sha256"
 CLEANING_MANIFEST_PATH = "reports/cleaning/current/cleaning_manifest.json"
 MANUAL_CONFLICT_PATH = "data/manual/modeling_conflict_decisions.csv"
-CLEANING_TAG = "dataset-cleaning-v1"
-CLEANING_TAG_COMMIT = "e566bb573ac08a2e68cb21748a967d21ee4b2b0f"
-CLEANING_RUN_ID = "20260704_130911_599434_UTC_a2cf0ca3"
-CLEANING_AUDIT_RUN_ID = "20260704_125032_638051_UTC_a2cf0ca3"
+CLEANING_TAG = "dataset-cleaning-v1.2"
+CLEANING_TAG_COMMIT = "69f12496d98aee334f955893cf102b53d70aa0cd"
+CLEANING_RUN_ID = "20260705_154614_567321_UTC_444f5190"
+CLEANING_AUDIT_RUN_ID = "20260705_135742_751888_UTC_444f5190"
 CLEANING_INPUT_FINGERPRINT = (
-    "a2cf0ca354b4d3cbaee8e8b37e4de0afb481fa633a59341ed0f33f281784e93d"
+    "444f5190c91d070f1a9c469d1db6aef7f93ce9a2c6228f1487d021d7cc42f248"
 )
 CLEANING_MANIFEST_SHA256 = (
-    "790a354e7db78ba844a2a3c346d526475b503de03ccda7efd35121b2a4fc973b"
+    "dca356d456167dae5424a6b6b240263c11caea2d33564a8a9d600b9da239da2f"
 )
 CLEANING_SETTINGS = {
     "split_method": "random",
@@ -211,7 +211,7 @@ def _load_cleaning_manifest(root: Path) -> dict[str, Any]:
 
 
 def cleaning_tag_commit(root: Path) -> str:
-    """验证 dataset-cleaning-v1 指向固定提交。"""
+    """验证清洗冻结标签指向固定提交。"""
 
     result = subprocess.run(
         ["git", "-C", str(root), "rev-list", "-n", "1", CLEANING_TAG],

@@ -9,9 +9,6 @@ from collections import Counter, defaultdict
 from pathlib import Path
 from typing import Any
 
-import pytest
-
-
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
@@ -103,8 +100,13 @@ def test_records_and_roles_full_frozen_regression() -> None:
     assert extra.structure_status == "ineligible"
 
 
-def test_validate_core_rejects_nonreproducible_frozen_scaffold_without_side_effects() -> None:
+def test_validate_core_full_regression_without_side_effects() -> None:
     before = _guarded_snapshot()
-    with pytest.raises(ValueError, match="Murcko scaffold 与重算值不一致"):
-        validate_core(ROOT)
+    result = validate_core(ROOT)
     assert _guarded_snapshot() == before
+    assert result.summary["status"] == "validated_core"
+    assert result.summary["records_all"] == 38686
+    assert result.summary["compound_count"] == 8267
+    assert result.summary["conflict_count"] == 614
+    assert len(result.fingerprints) == result.summary["structure_eligible_count"]
+    assert len(result.review_candidates) == 614
