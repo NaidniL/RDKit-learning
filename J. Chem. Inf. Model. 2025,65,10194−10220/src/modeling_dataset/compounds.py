@@ -19,7 +19,6 @@ from .structure_algorithms import (
     murcko_scaffold,
     nonisomeric_parent_smiles,
     parse_parent,
-    scaffold_graph_equivalent,
     standardized_inchikey,
     tautomer_family_key,
 )
@@ -184,7 +183,7 @@ def build_compounds(
                 if len(frozen_scaffolds) != 1:
                     raise ValueError(f"化合物 {key} 的冻结 Murcko scaffold 不唯一")
                 scaffold = next(iter(frozen_scaffolds))
-                if not scaffold_graph_equivalent(scaffold, recalculated_scaffold):
+                if scaffold != recalculated_scaffold:
                     raise ValueError(f"化合物 {key} 的 Murcko scaffold 与重算值不一致")
                 fingerprints[compound_id] = ecfp4(molecule)
         rows.append(

@@ -103,8 +103,8 @@ def test_records_and_roles_full_frozen_regression() -> None:
     assert extra.structure_status == "ineligible"
 
 
-def test_validate_core_rejects_invalid_frozen_parent_without_side_effects() -> None:
+def test_validate_core_rejects_nonreproducible_frozen_scaffold_without_side_effects() -> None:
     before = _guarded_snapshot()
-    with pytest.raises(ValueError, match="CC\\(=O\\)c1c\\(=O\\)cc\\(C\\)oc1=O"):
+    with pytest.raises(ValueError, match="Murcko scaffold 与重算值不一致"):
         validate_core(ROOT)
     assert _guarded_snapshot() == before

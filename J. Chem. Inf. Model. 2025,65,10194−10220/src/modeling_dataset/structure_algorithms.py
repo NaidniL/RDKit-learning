@@ -56,28 +56,8 @@ def tautomer_family_key(molecule: Any) -> str:
 
 def murcko_scaffold(molecule: Any) -> str:
     scaffold = MurckoScaffold.GetScaffoldForMol(molecule)
+    Chem.RemoveStereochemistry(scaffold)
     return str(Chem.MolToSmiles(scaffold, canonical=True, isomericSmiles=False))
-
-
-def scaffold_graph_equivalent(left: str, right: str) -> bool:
-    """核对骨架拓扑，容纳 RDKit 对断键端原子的隐式氢差异。"""
-
-    if left == right:
-        return True
-    with rdBase.BlockLogs():
-        left_mol = Chem.MolFromSmiles(left)
-        right_mol = Chem.MolFromSmiles(right)
-    if left_mol is None or right_mol is None:
-        return False
-    if (
-        left_mol.GetNumAtoms() != right_mol.GetNumAtoms()
-        or left_mol.GetNumBonds() != right_mol.GetNumBonds()
-    ):
-        return False
-    return bool(
-        left_mol.HasSubstructMatch(right_mol)
-        or right_mol.HasSubstructMatch(left_mol)
-    )
 
 
 def ecfp4(molecule: Any) -> Any:

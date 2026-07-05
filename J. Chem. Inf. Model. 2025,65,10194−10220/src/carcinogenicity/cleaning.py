@@ -727,6 +727,9 @@ def standardize_smiles(smiles: str) -> dict[str, Any]:
         parent_smiles = roundtrip_safe_parent_smiles(parent, inchikey)
         if parent_smiles != canonical_tautomer_smiles:
             notes.append("parent SMILES 采用可回读 Kekulé 表示")
+        roundtrip_parent = Chem.MolFromSmiles(parent_smiles)
+        if roundtrip_parent is None:
+            raise ValueError("parent SMILES 安全校验后仍无法回读")
         connectivity_key = inchikey.split("-", maxsplit=1)[0]
         charge_after = Chem.GetFormalCharge(parent)
         if charge_after:
@@ -735,7 +738,8 @@ def standardize_smiles(smiles: str) -> dict[str, Any]:
             notes.append("已执行互变异构体规范化")
         if inorganic_review_required:
             notes.append("疑似无机含碳小分子，需人工审核")
-        scaffold_mol = MurckoScaffold.GetScaffoldForMol(parent)
+        scaffold_mol = MurckoScaffold.GetScaffoldForMol(roundtrip_parent)
+        Chem.RemoveStereochemistry(scaffold_mol)
         scaffold = (
             Chem.MolToSmiles(
                 scaffold_mol, canonical=True, isomericSmiles=False

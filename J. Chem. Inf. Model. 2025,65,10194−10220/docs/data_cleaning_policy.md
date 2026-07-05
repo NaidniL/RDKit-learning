@@ -122,7 +122,8 @@ uncertain。
     canonical isomeric SMILES，并用锁定 RDKit 立即回读；只有默认表示无法回读或
     回读后完整 InChIKey 改变时，才惰性尝试 canonical Kekulé SMILES。
 15. 从规范化后的 parent 生成 standard InChIKey、前 14 位 `connectivity_key` 和
-    Bemis-Murcko scaffold。最终 parent SMILES 必须可回读且回读后完整 InChIKey
+    Bemis-Murcko scaffold；scaffold 必须从已安全回读的 parent 分子生成，不得从
+    不可序列化复现的中间内存状态生成。最终 parent SMILES 必须可回读且回读后完整 InChIKey
     与内存 parent 完全一致；默认与 Kekulé 表示均不满足时标准化失败。
 16. 分别记录 `rdkit_parse_ok`、`model_structure_ok` 和
     `leakage_connectivity_keys_json`：原始结构能解析不等于可建模，被排除的多片段结构仍保留

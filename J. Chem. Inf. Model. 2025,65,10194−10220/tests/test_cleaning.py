@@ -69,6 +69,7 @@ def test_parent_smiles_falls_back_to_roundtrip_safe_kekule_form() -> None:
     reparsed = Chem.MolFromSmiles(result["parent_smiles"])
     assert reparsed is not None
     assert Chem.MolToInchiKey(reparsed) == result["standard_inchikey"]
+    assert result["murcko_scaffold"] == "O=C1C=COC(=O)C1"
     assert "parent SMILES 采用可回读 Kekulé 表示" in result[
         "standardization_notes"
     ]
