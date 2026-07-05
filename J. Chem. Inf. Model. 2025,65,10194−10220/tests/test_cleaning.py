@@ -30,6 +30,7 @@ from carcinogenicity.cleaning import (  # noqa: E402
     normalize_dtxsid,
     output_file_manifest,
     runtime_signature,
+    roundtrip_safe_parent_smiles,
     run_cleaning,
     scaffold_connectivity_groups,
     sha256,
@@ -55,6 +56,53 @@ def test_tautomer_standardization_preserves_sp3_stereo() -> None:
     assert right["rdkit_mol_ok"]
     assert left["standard_inchikey"] != right["standard_inchikey"]
     assert left["connectivity_key"] == right["connectivity_key"]
+
+
+def test_parent_smiles_falls_back_to_roundtrip_safe_kekule_form() -> None:
+    """RDKit 默认芳香写法不可回读时必须使用等价 Kekulé 表示。"""
+
+    result = standardize_smiles("CC(=O)[c-]1c(=O)cc(C)oc1=O.[Na+]")
+
+    assert result["rdkit_mol_ok"]
+    assert result["standard_inchikey"] == "PGRHXDWITVMQBC-UHFFFAOYSA-N"
+    assert result["parent_smiles"] == "CC(=O)C1C(=O)C=C(C)OC1=O"
+    reparsed = Chem.MolFromSmiles(result["parent_smiles"])
+    assert reparsed is not None
+    assert Chem.MolToInchiKey(reparsed) == result["standard_inchikey"]
+    assert "parent SMILES 采用可回读 Kekulé 表示" in result[
+        "standardization_notes"
+    ]
+
+
+def test_parent_smiles_roundtrip_rejects_inchikey_change() -> None:
+    molecule = Chem.MolFromSmiles("CCO")
+    assert molecule is not None
+    with pytest.raises(ValueError, match="InChIKey 改变"):
+        roundtrip_safe_parent_smiles(
+            molecule, "AAAAAAAAAAAAAA-BBBBBBBBBB-C"
+        )
+
+
+def test_parent_smiles_does_not_call_kekule_when_default_is_safe(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    molecule = Chem.MolFromSmiles("CCO")
+    assert molecule is not None
+    expected_inchikey = Chem.MolToInchiKey(molecule)
+    original = Chem.MolToSmiles
+    calls: list[bool] = []
+
+    def controlled_mol_to_smiles(mol: Chem.Mol, **kwargs: object) -> str:
+        use_kekule = kwargs.get("kekuleSmiles") is True
+        calls.append(use_kekule)
+        if use_kekule:
+            raise RuntimeError("模拟 Kekulé 写出失败")
+        return original(mol, **kwargs)
+
+    monkeypatch.setattr(Chem, "MolToSmiles", controlled_mol_to_smiles)
+
+    assert roundtrip_safe_parent_smiles(molecule, expected_inchikey) == "CCO"
+    assert calls == [False]
 
 
 def test_empty_aggregation_retains_compound_schema() -> None:

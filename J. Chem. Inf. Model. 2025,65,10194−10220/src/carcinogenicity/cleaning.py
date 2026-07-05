@@ -585,6 +585,31 @@ def empty_structure_result(smiles: str) -> dict[str, Any]:
     }
 
 
+def roundtrip_safe_parent_smiles(parent: Chem.Mol, expected_inchikey: str) -> str:
+    """生成可由锁定 RDKit 回读且 InChIKey 不变的 parent SMILES。"""
+
+    def is_safe(candidate: str) -> bool:
+        reparsed = Chem.MolFromSmiles(candidate)
+        if reparsed is None:
+            return False
+        return Chem.MolToInchiKey(reparsed) == expected_inchikey
+
+    default_candidate = Chem.MolToSmiles(
+        parent, canonical=True, isomericSmiles=True
+    )
+    if is_safe(default_candidate):
+        return default_candidate
+    kekule_candidate = Chem.MolToSmiles(
+        parent,
+        canonical=True,
+        isomericSmiles=True,
+        kekuleSmiles=True,
+    )
+    if is_safe(kekule_candidate):
+        return kekule_candidate
+    raise ValueError("parent SMILES 无法安全回读或回读后 InChIKey 改变")
+
+
 def standardize_smiles(smiles: str) -> dict[str, Any]:
     result = empty_structure_result(smiles)
     notes = []
@@ -691,12 +716,17 @@ def standardize_smiles(smiles: str) -> dict[str, Any]:
         # 重新分配互变异构体规范化后仍然有效的立体信息。
         tautomer_enumerator.SetReassignStereo(True)
         parent = tautomer_enumerator.Canonicalize(parent)
-        parent_smiles = Chem.MolToSmiles(parent, canonical=True, isomericSmiles=True)
-        tautomer_standardized = before_tautomer != parent_smiles
+        canonical_tautomer_smiles = Chem.MolToSmiles(
+            parent, canonical=True, isomericSmiles=True
+        )
+        tautomer_standardized = before_tautomer != canonical_tautomer_smiles
         inchikey = Chem.MolToInchiKey(parent)
         if not inchikey:
             result["standardization_notes"] = "InChIKey生成失败"
             return result
+        parent_smiles = roundtrip_safe_parent_smiles(parent, inchikey)
+        if parent_smiles != canonical_tautomer_smiles:
+            notes.append("parent SMILES 采用可回读 Kekulé 表示")
         connectivity_key = inchikey.split("-", maxsplit=1)[0]
         charge_after = Chem.GetFormalCharge(parent)
         if charge_after:

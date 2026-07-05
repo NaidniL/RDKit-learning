@@ -118,9 +118,12 @@ uncertain。
    显式设置 `SetRemoveSp3Stereo(False)` 以保留四面体手性中心，并使用
    `SetReassignStereo(True)` 重新分配规范化后仍然有效的立体信息。参与互变异构的双键立体信息
    继续采用 RDKit 默认处理。
-14. canonical SMILES 和 parent SMILES 均保留可用的立体化学信息。
+14. canonical SMILES 和 parent SMILES 均保留可用的立体化学信息。parent 先写为
+    canonical isomeric SMILES，并用锁定 RDKit 立即回读；只有默认表示无法回读或
+    回读后完整 InChIKey 改变时，才惰性尝试 canonical Kekulé SMILES。
 15. 从规范化后的 parent 生成 standard InChIKey、前 14 位 `connectivity_key` 和
-    Bemis-Murcko scaffold。
+    Bemis-Murcko scaffold。最终 parent SMILES 必须可回读且回读后完整 InChIKey
+    与内存 parent 完全一致；默认与 Kekulé 表示均不满足时标准化失败。
 16. 分别记录 `rdkit_parse_ok`、`model_structure_ok` 和
     `leakage_connectivity_keys_json`：原始结构能解析不等于可建模，被排除的多片段结构仍保留
     其所有潜在有机组分的连接层键。
