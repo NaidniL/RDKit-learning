@@ -3,6 +3,7 @@ jupyterlab==4.2.4
 ipykernel==6.29.5
 pytest==8.3.2
 ruff==0.5.5
+mypy==1.11.1
 pypdf==6.14.2
 openpyxl==3.1.5
 xlrd==2.0.1

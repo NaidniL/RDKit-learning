@@ -77,6 +77,8 @@ matplotlib-inline==0.2.2
 mdurl==0.1.2
 mistune==3.3.2
 ml-dtypes==0.4.1
+mypy==1.11.1
+mypy_extensions==1.1.0
 namex==0.1.0
 narwhals==2.23.0
 nbclient==0.11.0
