@@ -1,0 +1,125 @@
+{
+  "manifest_version": 3,
+  "run_id": "20260705_135742_751888_UTC_444f5190",
+  "created_at_utc": "2026-07-05T14:02:13.285784+00:00",
+  "run_type": "audit",
+  "input_fingerprint": "444f5190c91d070f1a9c469d1db6aef7f93ce9a2c6228f1487d021d7cc42f248",
+  "approved_audit_run": "",
+  "runtime_signature": {
+    "python": "3.10.20",
+    "rdkit": "2023.9.6",
+    "numpy": "1.26.4",
+    "pandas": "2.2.2",
+    "scikit_learn": "1.5.1",
+    "platform": "macOS-15.6.1-arm64-arm-64bit",
+    "machine": "arm64",
+    "inchi_library_version": "InChI version 1, Software v. 1.06 (API Library)",
+    "inchi_implementation_sha256": "e3dcbafe99e08e2b4e6444ebf887031fbfac7c1381295739d291507ed5e68cd0"
+  },
+  "output_files": {
+    "conflict_set.csv": {
+      "sha256": "8bf0452c2a143ec11783bcaf86cea20c78a52106d92b07c4ebcda159c3a3a9a3",
+      "rows": 613
+    },
+    "development_pool.csv": {
+      "sha256": "46de8ec83c2822d136724a69b72a8c54c7f90dfbafba72f7e008a3dc1e881464",
+      "rows": 864
+    },
+    "development_review_candidates.csv": {
+      "sha256": "88c07258a3767afbf2dab717b336af158575362750a02e0994d276d488a3a8db",
+      "rows": 29
+    },
+    "discordant_evidence_set.csv": {
+      "sha256": "7b6002ee2c578f6d2fd660bf5df5310d67d4ed93fd0df1f58e2834bb2adf3f75",
+      "rows": 69
+    },
+    "excluded_set.csv": {
+      "sha256": "807944df0a19ce09e2071df07919c5e7af0afcd52b33e486b4e3b41843c8d9d8",
+      "rows": 13029
+    },
+    "external_ccris_test.csv": {
+      "sha256": "f74ac5cc020be2a1bb3dad3be568ab6abcc2cedb566c4342003c6caaf22f109f",
+      "rows": 455
+    },
+    "external_review_candidates.csv": {
+      "sha256": "722aa7b0e1dec386087e616bf0940f37130bea39575a5012fffec8507b2bb849",
+      "rows": 27
+    },
+    "inorganic_carbon_review.csv": {
+      "sha256": "6df6b390851bff28f41021ff8707aa61c83e9a3129b845f8b525df58754a0ea6",
+      "rows": 80
+    },
+    "source_records_audit.csv": {
+      "sha256": "afa26c6b309924e7da0ed2429b44b058bc123774a7f14954407c6f59dbab7c0f",
+      "rows": 38686
+    },
+    "structure_representation_conflict.csv": {
+      "sha256": "8b9773d365a2df180bf7033d5332563ca1ff649dd9674b235172371e4ce6d5f8",
+      "rows": 4
+    },
+    "train.csv": {
+      "sha256": "97091839d9c51d1d3d05e95cc155df0d7e741adfa3c2bba04a5ba8449b8f74c3",
+      "rows": 691
+    },
+    "uncertain_set.csv": {
+      "sha256": "20278343570abf33ebc116d8cf6028240c05f7a1829a70878d62c6a90c2f6dd0",
+      "rows": 392
+    },
+    "validation.csv": {
+      "sha256": "de7b9b724c3d6e83634d8911d746951352bf3688833faa1411fe884bf9f8e4e8",
+      "rows": 173
+    }
+  },
+  "report_files": {
+    "connectivity_overlap_report.csv": {
+      "sha256": "84043143117fd90aee67fba4c1cc755203a657940f64e081d791b517d2b09e70",
+      "rows": 2
+    },
+    "development_review_candidates.csv": {
+      "sha256": "88c07258a3767afbf2dab717b336af158575362750a02e0994d276d488a3a8db",
+      "rows": 29
+    },
+    "discordant_evidence_report.csv": {
+      "sha256": "7b6002ee2c578f6d2fd660bf5df5310d67d4ed93fd0df1f58e2834bb2adf3f75",
+      "rows": 69
+    },
+    "external_review_candidates.csv": {
+      "sha256": "722aa7b0e1dec386087e616bf0940f37130bea39575a5012fffec8507b2bb849",
+      "rows": 27
+    },
+    "inorganic_carbon_review.csv": {
+      "sha256": "6df6b390851bff28f41021ff8707aa61c83e9a3129b845f8b525df58754a0ea6",
+      "rows": 80
+    },
+    "label_mapping_report.csv": {
+      "sha256": "70c62b63db270ca85e1da4aac8a7e6fc2878be337228eddc7853500f467114a0",
+      "rows": 20
+    },
+    "overlap_report.csv": {
+      "sha256": "950e0d5cead064e7cc123feae66540dc20b6c11d41a7631e93ba6d6db910620d",
+      "rows": 868
+    },
+    "raw_label_mapping_report.csv": {
+      "sha256": "abdca0957a3e399aa7b8db48095c1a1a4f58279a0126ef04f5e99ec95ad7c7ae",
+      "rows": 260
+    },
+    "split_report.csv": {
+      "sha256": "e5817fcb1f06b131c778cec197f2ef65bf1ac6aa6a1b03ccf9b0f7a5934b1f6f",
+      "rows": 9
+    },
+    "structure_representation_conflict_report.csv": {
+      "sha256": "8b9773d365a2df180bf7033d5332563ca1ff649dd9674b235172371e4ce6d5f8",
+      "rows": 4
+    }
+  },
+  "support_files": {
+    "cleaning_log.md": {
+      "sha256": "95e4f2204f1a76abfd497536fae6579e65646147022aebfbe00831fe07edd021"
+    }
+  },
+  "settings": {
+    "split_method": "random",
+    "validation_size": 0.2,
+    "random_seed": 42
+  }
+}
