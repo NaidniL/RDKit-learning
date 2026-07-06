@@ -1,4 +1,4 @@
-"""实现批次 2 的纯内存核心重建与冻结回归。"""
+"""实现批次 3 的纯内存核心重建与泄漏状态收敛。"""
 
 from __future__ import annotations
 
@@ -10,14 +10,16 @@ from typing import Any, Iterable, Mapping
 
 from .compounds import CompoundBuild, build_compounds
 from .duplicate_groups import build_duplicate_groups
-from .enums import DatasetRole, LabelStatus
+from .enums import DatasetRole, LabelStatus, LeakageStatus, SplitEligibility
 from .fingerprint import input_fingerprint
+from .leakage import LeakageBuild, build_leakage
 from .manual_reviews import (
     apply_manual_reviews,
     build_review_candidates,
     load_manual_reviews,
 )
 from .record_exclusions import build_record_exclusions
+from .role_finalization import finalize_role_resolutions
 from .role_resolution import CoreRoleResolution, build_core_role_resolutions
 from .source_records import load_records_all
 from .schema_registry import SCHEMA_REGISTRY
@@ -37,8 +39,11 @@ class CoreBuild:
     compounds: list[dict[str, Any]]
     fingerprints: dict[str, Any]
     role_resolutions: list[CoreRoleResolution]
+    finalized_role_resolutions: list[dict[str, Any]]
+    compound_exclusions: list[dict[str, Any]]
     duplicate_groups: list[dict[str, Any]]
     review_candidates: list[dict[str, Any]]
+    leakage: LeakageBuild
     summary: dict[str, Any]
 
 
@@ -161,6 +166,9 @@ def _summary(
     compounds: list[dict[str, Any]],
     resolutions: list[CoreRoleResolution],
     duplicate_groups: list[dict[str, Any]],
+    finalized: list[dict[str, Any]],
+    compound_exclusions: list[dict[str, Any]],
+    leakage: LeakageBuild,
     decisions: dict[tuple[str, str], dict[str, Any]],
     fingerprint: str,
 ) -> dict[str, Any]:
@@ -169,6 +177,8 @@ def _summary(
     structure_counts = Counter(str(row["structure_status"]) for row in compounds)
     duplicate_counts = Counter(str(row["exact_duplicate_class"]) for row in duplicate_groups)
     conflict_count = label_counts[LabelStatus.CONFLICT.value]
+    leakage_counts = Counter(str(row["leakage_status"]) for row in finalized)
+    eligibility_counts = Counter(str(row["split_eligibility"]) for row in finalized)
     return {
         "input_fingerprint": fingerprint,
         "records_all": len(records),
@@ -188,7 +198,26 @@ def _summary(
         "structure_eligible_count": structure_counts["eligible"],
         "structure_ineligible_count": structure_counts["ineligible"],
         "record_exclusion_count": len(exclusions),
+        "compound_exclusion_count": len(compound_exclusions),
         "duplicate_group_counts": dict(sorted(duplicate_counts.items())),
+        "development_exact_block_count": len(leakage.exact_block_keys),
+        "development_connectivity_block_count": len(
+            leakage.connectivity_block_keys
+        ),
+        "external_exact_overlap_count": leakage_counts[
+            LeakageStatus.EXACT_OVERLAP.value
+        ],
+        "external_connectivity_overlap_count": leakage_counts[
+            LeakageStatus.CONNECTIVITY_OVERLAP.value
+        ],
+        "external_tautomer_overlap_count": len(leakage.tautomer_overlap_ids),
+        "primary_external_count": len(leakage.primary_external_ids),
+        "tautomer_sensitivity_external_count": len(
+            leakage.sensitivity_external_ids
+        ),
+        "split_eligible_role_count": eligibility_counts[
+            SplitEligibility.ELIGIBLE.value
+        ],
         "manual_review_completed": len(decisions),
         "manual_review_required": conflict_count,
         "manual_review_coverage": len(decisions) / conflict_count,
@@ -209,6 +238,12 @@ def validate_core(root: Path) -> CoreBuild:
     resolutions = apply_manual_reviews(resolutions, decisions)
     duplicate_groups = build_duplicate_groups(resolutions)
     _assert_frozen_views(root, compound_build.rows, resolutions)
+    leakage = build_leakage(
+        root, records, compound_build.rows, resolutions
+    )
+    finalized, compound_exclusions = finalize_role_resolutions(
+        resolutions, leakage
+    )
     candidates = build_review_candidates(resolutions, decisions)
     summary = _summary(
         records,
@@ -216,6 +251,9 @@ def validate_core(root: Path) -> CoreBuild:
         compound_build.rows,
         resolutions,
         duplicate_groups,
+        finalized,
+        compound_exclusions,
+        leakage,
         decisions,
         fingerprint,
     )
@@ -225,7 +263,10 @@ def validate_core(root: Path) -> CoreBuild:
         compounds=compound_build.rows,
         fingerprints=compound_build.fingerprints,
         role_resolutions=resolutions,
+        finalized_role_resolutions=finalized,
+        compound_exclusions=compound_exclusions,
         duplicate_groups=duplicate_groups,
         review_candidates=candidates,
+        leakage=leakage,
         summary=summary,
     )

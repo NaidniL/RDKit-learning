@@ -1,4 +1,4 @@
-"""阶段 2 建模数据集组装入口（实现批次 2）。"""
+"""阶段 2 建模数据集组装入口（实现批次 3）。"""
 
 from __future__ import annotations
 
@@ -47,7 +47,7 @@ def main(argv: list[str] | None = None) -> int:
         fingerprint, descriptor = input_fingerprint(
             ROOT,
             parameters={
-                "implementation_batch": 2,
+                "implementation_batch": 3,
                 "schema_count": len(ARTIFACT_SCHEMAS),
             },
         )
@@ -73,7 +73,7 @@ def main(argv: list[str] | None = None) -> int:
         return 0
     if args.command == "audit":
         print(
-            "完整 leakage、split 与报告尚未实现；批次 2 不会创建 assembly audit 目录。",
+            "split 与发布报告尚未实现；批次 3 不会创建 assembly audit 目录。",
             file=sys.stderr,
         )
         return 2
