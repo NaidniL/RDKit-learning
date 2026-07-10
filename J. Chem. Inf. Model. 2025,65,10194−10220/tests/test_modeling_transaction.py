@@ -12,6 +12,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
 from modeling_dataset.transaction import (  # noqa: E402
+    AuditTransaction,
     ReleaseTransaction,
     SealedLog,
     SimulatedCrash,
@@ -62,10 +63,10 @@ def test_crash_keeps_old_pointer_valid(tmp_path: Path, crash_at: str) -> None:
     assert old_root.is_dir()
 
 
-def test_public_formal_commit_is_hard_rejected(tmp_path: Path) -> None:
+def test_incomplete_public_formal_commit_is_rejected(tmp_path: Path) -> None:
     releases = tmp_path / "releases"
     with ReleaseTransaction(releases, "release-1") as transaction:
-        with pytest.raises(RuntimeError, match="禁止正式 commit"):
+        with pytest.raises(ValueError, match="全部登记 artifacts"):
             transaction.commit(
                 input_fingerprint="f" * 64,
                 runtime_signature={"python": "3.10"},
@@ -76,7 +77,24 @@ def test_public_formal_commit_is_hard_rejected(tmp_path: Path) -> None:
     assert not (releases / "current_release.json").exists()
 
 
-def test_cli_hard_rejects_audit_and_formal_without_side_effects(
+def test_incomplete_audit_is_rejected_and_temp_directory_removed(
+    tmp_path: Path,
+) -> None:
+    audits = tmp_path / "audits"
+    with AuditTransaction(audits, "audit-1") as transaction:
+        with pytest.raises(ValueError, match="全部正式候选"):
+            transaction.commit(
+                input_fingerprint="f" * 64,
+                runtime_signature={"python": "3.10"},
+                settings={},
+                release_artifact_paths=set(),
+                audit_only_artifact_paths=set(),
+            )
+    assert not (audits / "audit-1").exists()
+    assert not list(audits.glob(".audit-1.tmp-*"))
+
+
+def test_cli_rejects_unknown_formal_audit_without_side_effects(
     tmp_path: Path,
 ) -> None:
     del tmp_path
@@ -85,27 +103,19 @@ def test_cli_hard_rejects_audit_and_formal_without_side_effects(
     script = ROOT / "scripts" / "assemble_modeling_dataset.py"
     before_audits = (ROOT / "audits" / "dataset_assembly").exists()
     before_releases = (ROOT / "releases" / "dataset_assembly").exists()
-    audit = subprocess.run(
-        [sys.executable, str(script), "audit", "--dry-run"],
-        cwd=ROOT,
-        capture_output=True,
-        text=True,
-        check=False,
-    )
     formal = subprocess.run(
         [
             sys.executable,
             str(script),
             "formal",
             "--approved-audit-run",
-            "audit-1",
+            "definitely-missing-audit",
         ],
         cwd=ROOT,
         capture_output=True,
         text=True,
         check=False,
     )
-    assert audit.returncode != 0 and "尚未实现" in audit.stderr
-    assert formal.returncode != 0 and "硬性拒绝" in formal.stderr
+    assert formal.returncode != 0
     assert (ROOT / "audits" / "dataset_assembly").exists() is before_audits
     assert (ROOT / "releases" / "dataset_assembly").exists() is before_releases

@@ -1,0 +1,15 @@
+split,source_combination,label,count
+train,"[""cpdb"",""iris""]",0,3
+train,"[""cpdb"",""iris""]",1,5
+train,"[""cpdb""]",0,398
+train,"[""cpdb""]",1,329
+train,"[""iris""]",0,1
+train,"[""iris""]",1,0
+validation,"[""cpdb"",""iris""]",0,0
+validation,"[""cpdb"",""iris""]",1,1
+validation,"[""cpdb""]",0,101
+validation,"[""cpdb""]",1,83
+external_test,"[""ccris""]",0,199
+external_test,"[""ccris""]",1,256
+external_tautomer_sensitivity,"[""ccris""]",0,199
+external_tautomer_sensitivity,"[""ccris""]",1,256

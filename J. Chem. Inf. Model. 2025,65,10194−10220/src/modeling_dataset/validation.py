@@ -169,11 +169,21 @@ def validate_role_state(state: RoleState, *, formal: bool = False) -> None:
         raise ValueError("conflict/uncertain 的标签必须为空")
 
     if state.label_status is LabelStatus.CONFLICT:
-        allowed_review = {ReviewStatus.PENDING, ReviewStatus.CONFIRMED_EXCLUDE}
+        allowed_review = {
+            ReviewStatus.PENDING,
+            ReviewStatus.CONFIRMED_EXCLUDE,
+            ReviewStatus.AUTOMATIC_EXCLUDE,
+        }
         if state.review_status not in allowed_review:
             raise ValueError("conflict 的 review_status 非法")
-        if formal and state.review_status is not ReviewStatus.CONFIRMED_EXCLUDE:
-            raise ValueError("正式 release 不允许 pending conflict")
+        if formal and state.review_status is ReviewStatus.PENDING:
+            raise ValueError("正式 release 不允许未裁决的标签冲突")
+    elif state.label_status in {LabelStatus.CLEAR_POSITIVE, LabelStatus.CLEAR_NEGATIVE}:
+        if state.review_status not in {
+            ReviewStatus.NOT_REQUIRED,
+            ReviewStatus.AUTOMATIC_RESOLVED,
+        }:
+            raise ValueError("明确标签的 review_status 非法")
     elif state.review_status is not ReviewStatus.NOT_REQUIRED:
         raise ValueError("非 conflict 行必须使用 review_status=not_required")
 

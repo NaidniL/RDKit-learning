@@ -91,6 +91,7 @@ def test_final_state_precedence_and_concurrent_reasons() -> None:
     assert by_id["CMP:DEV"]["split_eligibility"] == "ineligible_structure"
     assert by_id["CMP:DEV"]["exclusion_reasons_json"] == [
         "label_conflict",
+        "label_conflict_total_count_le_10",
         "structure_representation_conflict",
     ]
     assert "confirmed_exact_label_conflict_exclude" not in by_id["CMP:DEV"][
@@ -107,6 +108,7 @@ def test_final_state_precedence_and_concurrent_reasons() -> None:
         (row["compound_id"], row["exclusion_reason"]) for row in exclusions
     } == {
         ("CMP:DEV", "label_conflict"),
+        ("CMP:DEV", "label_conflict_total_count_le_10"),
         ("CMP:DEV", "structure_representation_conflict"),
         ("CMP:UNCERTAIN", "external_exact_overlap"),
         ("CMP:UNCERTAIN", "label_uncertain"),

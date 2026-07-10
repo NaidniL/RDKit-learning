@@ -115,6 +115,9 @@ def test_validate_core_full_regression_without_side_effects() -> None:
     assert result.summary["external_tautomer_overlap_count"] == 1182
     assert result.summary["primary_external_count"] == 455
     assert result.summary["tautomer_sensitivity_external_count"] == 455
-    assert result.summary["compound_exclusion_count"] == 8769
+    assert result.summary["automatic_resolution_count"] == 76
+    assert result.summary["automatic_exclusion_count"] == 538
+    assert result.summary["unresolved_conflict_count"] == 538
+    assert result.summary["compound_exclusion_count"] == 9231
     assert len(result.fingerprints) == result.summary["structure_eligible_count"]
     assert len(result.review_candidates) == 614

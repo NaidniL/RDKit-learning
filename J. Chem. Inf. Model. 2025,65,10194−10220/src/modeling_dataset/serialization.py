@@ -195,7 +195,7 @@ def parse_csv_scalar(text: str, spec: FieldSpec) -> Any:
 def _rank_name(field_name: str) -> str:
     if field_name in {"dataset_role_a", "dataset_role_b"}:
         return "dataset_role"
-    if field_name == "nearest_split":
+    if field_name in {"split", "comparison_split", "nearest_split"}:
         return "query_split"
     return field_name
 

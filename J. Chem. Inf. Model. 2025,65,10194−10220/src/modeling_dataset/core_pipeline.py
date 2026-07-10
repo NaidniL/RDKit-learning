@@ -14,9 +14,8 @@ from .enums import DatasetRole, LabelStatus, LeakageStatus, SplitEligibility
 from .fingerprint import input_fingerprint
 from .leakage import LeakageBuild, build_leakage
 from .manual_reviews import (
-    apply_manual_reviews,
+    apply_conflict_resolution,
     build_review_candidates,
-    load_manual_reviews,
 )
 from .record_exclusions import build_record_exclusions
 from .role_finalization import finalize_role_resolutions
@@ -169,14 +168,14 @@ def _summary(
     finalized: list[dict[str, Any]],
     compound_exclusions: list[dict[str, Any]],
     leakage: LeakageBuild,
-    decisions: dict[tuple[str, str], dict[str, Any]],
+    source_conflict_count: int,
     fingerprint: str,
 ) -> dict[str, Any]:
     label_counts = Counter(item.label_status.value for item in resolutions)
     role_counts = Counter(item.dataset_role.value for item in resolutions)
     structure_counts = Counter(str(row["structure_status"]) for row in compounds)
     duplicate_counts = Counter(str(row["exact_duplicate_class"]) for row in duplicate_groups)
-    conflict_count = label_counts[LabelStatus.CONFLICT.value]
+    unresolved_conflict_count = label_counts[LabelStatus.CONFLICT.value]
     leakage_counts = Counter(str(row["leakage_status"]) for row in finalized)
     eligibility_counts = Counter(str(row["split_eligibility"]) for row in finalized)
     return {
@@ -194,7 +193,8 @@ def _summary(
         "clear_positive_count": label_counts[LabelStatus.CLEAR_POSITIVE.value],
         "clear_negative_count": label_counts[LabelStatus.CLEAR_NEGATIVE.value],
         "uncertain_count": label_counts[LabelStatus.UNCERTAIN.value],
-        "conflict_count": conflict_count,
+        "conflict_count": source_conflict_count,
+        "unresolved_conflict_count": unresolved_conflict_count,
         "structure_eligible_count": structure_counts["eligible"],
         "structure_ineligible_count": structure_counts["ineligible"],
         "record_exclusion_count": len(exclusions),
@@ -218,9 +218,12 @@ def _summary(
         "split_eligible_role_count": eligibility_counts[
             SplitEligibility.ELIGIBLE.value
         ],
-        "manual_review_completed": len(decisions),
-        "manual_review_required": conflict_count,
-        "manual_review_coverage": len(decisions) / conflict_count,
+        "automatic_resolution_count": sum(
+            item.review_status.value == "automatic_resolved" for item in resolutions
+        ),
+        "automatic_exclusion_count": sum(
+            item.review_status.value == "automatic_exclude" for item in resolutions
+        ),
         "status": "validated_core",
     }
 
@@ -233,18 +236,20 @@ def validate_core(root: Path) -> CoreBuild:
     validate_rows(records, SCHEMA_REGISTRY["modeling/records_all.csv"])
     exclusions = build_record_exclusions(records)
     compound_build: CompoundBuild = build_compounds(root, records)
-    resolutions = build_core_role_resolutions(records, compound_build.rows)
-    decisions = load_manual_reviews(root, resolutions)
-    resolutions = apply_manual_reviews(resolutions, decisions)
+    raw_resolutions = build_core_role_resolutions(records, compound_build.rows)
+    _assert_frozen_views(root, compound_build.rows, raw_resolutions)
+    source_conflict_count = sum(
+        item.label_status is LabelStatus.CONFLICT for item in raw_resolutions
+    )
+    resolutions = apply_conflict_resolution(raw_resolutions)
     duplicate_groups = build_duplicate_groups(resolutions)
-    _assert_frozen_views(root, compound_build.rows, resolutions)
     leakage = build_leakage(
         root, records, compound_build.rows, resolutions
     )
     finalized, compound_exclusions = finalize_role_resolutions(
         resolutions, leakage
     )
-    candidates = build_review_candidates(resolutions, decisions)
+    candidates = build_review_candidates(resolutions)
     summary = _summary(
         records,
         exclusions,
@@ -254,7 +259,7 @@ def validate_core(root: Path) -> CoreBuild:
         finalized,
         compound_exclusions,
         leakage,
-        decisions,
+        source_conflict_count,
         fingerprint,
     )
     return CoreBuild(

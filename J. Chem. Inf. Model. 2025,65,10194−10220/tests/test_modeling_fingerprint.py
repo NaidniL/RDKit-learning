@@ -95,7 +95,11 @@ def test_fingerprint_is_stable_and_independent_of_run_id(
     assert first_descriptor == second_descriptor
     assert "run_id" not in first_descriptor
     assert "run_id" not in first_descriptor["parameters"]["invocation"]
-    assert first_descriptor["manual_conflict_file"]["state"] == "missing"
+    assert first_descriptor["conflict_resolution"] == {
+        "method": "ordered_clear_label_counts_v1",
+        "total_count_max": 10,
+        "count_margin_max": 10,
+    }
     fixed = first_descriptor["parameters"]["fixed"]
     assert fixed["primary_split"]["random_seed"] == 42
     assert fixed["ecfp4"]["radius"] == 2
@@ -103,7 +107,7 @@ def test_fingerprint_is_stable_and_independent_of_run_id(
     assert first_descriptor["cleaning_freeze"]["commit"] == CLEANING_TAG_COMMIT
 
 
-def test_fingerprint_changes_when_manual_input_appears(
+def test_fingerprint_ignores_retired_manual_conflict_file(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     root = build_fake_project(tmp_path, monkeypatch)
@@ -115,8 +119,8 @@ def test_fingerprint_changes_when_manual_input_appears(
         encoding="utf-8",
     )
     after, descriptor = input_fingerprint(root)
-    assert before != after
-    assert descriptor["manual_conflict_file"]["state"] == "present"
+    assert before == after
+    assert descriptor["conflict_resolution"]["method"] == "ordered_clear_label_counts_v1"
 
 
 def test_processed_tampering_is_rejected(

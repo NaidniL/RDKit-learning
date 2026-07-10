@@ -229,7 +229,10 @@ def _compare_digest(
 
 
 def verify_artifact_map(
-    release_root: Path, artifact_map: Mapping[str, Mapping[str, Any]]
+    release_root: Path,
+    artifact_map: Mapping[str, Mapping[str, Any]],
+    *,
+    formal: bool = False,
 ) -> None:
     for relative_path, metadata in artifact_map.items():
         schema = SCHEMA_REGISTRY.get(relative_path)
@@ -237,7 +240,7 @@ def verify_artifact_map(
             raise ValueError(f"manifest 引用了未注册 artifact：{relative_path}")
         path = secure_join(release_root, relative_path, must_exist=True)
         if schema.artifact_format is ArtifactFormat.CSV:
-            read_and_validate_csv(path, schema, formal=True)
+            read_and_validate_csv(path, schema, formal=formal)
         else:
             read_and_validate_json(path, schema)
         actual = digest_file(
@@ -255,7 +258,7 @@ def verify_release_directory(release_root: Path, manifest: Mapping[str, Any]) ->
         raise ValueError("formal manifest 的 release_artifacts 类型错误")
     if set(release_map) != RELEASE_PATHS:
         raise ValueError("正式 release 未包含全部注册 artifacts")
-    verify_artifact_map(release_root, release_map)
+    verify_artifact_map(release_root, release_map, formal=True)
     log = manifest.get("log")
     if not isinstance(log, dict) or not isinstance(log.get("path"), str):
         raise ValueError("manifest log 元数据非法")
@@ -266,6 +269,38 @@ def verify_release_directory(release_root: Path, manifest: Mapping[str, Any]) ->
     if actual_files != expected_files:
         raise ValueError(
             "正式 release 文件集合不一致；"
+            f"缺少={sorted(expected_files - actual_files)}，"
+            f"多出={sorted(actual_files - expected_files)}"
+        )
+
+
+def verify_audit_directory(audit_root: Path, manifest: Mapping[str, Any]) -> None:
+    """验证已封存 audit 的全部候选、审查辅助和日志。"""
+
+    if manifest.get("run_type") != "audit":
+        raise ValueError("审计目录 manifest 的 run_type 不是 audit")
+    release_map = manifest.get("release_artifacts")
+    audit_only_map = manifest.get("audit_only_artifacts")
+    if not isinstance(release_map, dict) or not isinstance(audit_only_map, dict):
+        raise ValueError("audit manifest artifact map 类型错误")
+    if set(release_map) != RELEASE_PATHS or set(audit_only_map) != AUDIT_ONLY_PATHS:
+        raise ValueError("audit manifest 未覆盖精确 artifact 集合")
+    verify_artifact_map(audit_root, release_map, formal=False)
+    verify_artifact_map(audit_root, audit_only_map, formal=False)
+    log = manifest.get("log")
+    if not isinstance(log, dict) or not isinstance(log.get("path"), str):
+        raise ValueError("audit manifest 日志元数据非法")
+    log_path = secure_join(audit_root, log["path"], must_exist=True)
+    _compare_digest(log["path"], digest_file(log_path), log)
+    expected_files = (
+        set(release_map)
+        | set(audit_only_map)
+        | {"audit_manifest.json", str(log["path"])}
+    )
+    actual_files = collect_regular_files(audit_root)
+    if actual_files != expected_files:
+        raise ValueError(
+            "audit 文件集合不一致；"
             f"缺少={sorted(expected_files - actual_files)}，"
             f"多出={sorted(actual_files - expected_files)}"
         )

@@ -106,7 +106,7 @@ def test_pending_conflict_is_allowed_only_for_audit() -> None:
         split_eligibility=SplitEligibility.INELIGIBLE_LABEL,
     )
     validate_role_state(state, formal=False)
-    with pytest.raises(ValueError, match="不允许 pending"):
+    with pytest.raises(ValueError, match="不允许未裁决"):
         validate_role_state(state, formal=True)
 
 
@@ -132,17 +132,18 @@ def test_unique_key_and_inchikey_validation() -> None:
         validate_rows([base, dict(base)], schema)
 
 
-def test_invalid_date_source_and_numeric_ranges_are_rejected() -> None:
+def test_invalid_conflict_decision_source_and_numeric_ranges_are_rejected() -> None:
     review_schema = SCHEMA_REGISTRY["modeling/conflict_reviews.csv"]
     review = {
         "compound_id": "CMP:AAAAAAAAAAAAAA-BBBBBBBBBB-C",
         "dataset_role": "development",
-        "decision": "confirm_exclude",
-        "review_reason": "确认排除",
-        "reviewer": "测试",
-        "reviewed_at_utc": "2026-99-99T99:99:99Z",
+        "clear_positive_count": 12,
+        "clear_negative_count": 1,
+        "decision": "assign_positive",
+        "resolved_label": 2,
+        "resolution_reason": "测试",
     }
-    with pytest.raises(ValueError, match="日期非法"):
+    with pytest.raises(ValueError, match="大于最大值"):
         validate_row(review, review_schema)
 
     exclusion_schema = SCHEMA_REGISTRY["modeling/record_exclusions.csv"]

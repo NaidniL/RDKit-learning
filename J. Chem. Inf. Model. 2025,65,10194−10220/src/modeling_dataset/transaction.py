@@ -4,11 +4,19 @@ from __future__ import annotations
 
 import os
 import re
+import shutil
 import tempfile
 from pathlib import Path
 from typing import Any, Mapping
 
 from .paths import fsync_directory, secure_join
+from .manifests import (
+    AUDIT_ONLY_PATHS,
+    RELEASE_PATHS,
+    build_artifact_map,
+    build_manifest,
+    write_manifest,
+)
 from .serialization import (
     FileDigest,
     canonical_json_bytes,
@@ -114,17 +122,60 @@ class ReleaseTransaction:
         approved_audit_run: str,
         crash_at: str | None = None,
     ) -> Path:
-        del (
-            input_fingerprint,
-            runtime_signature,
-            settings,
-            release_artifact_paths,
-            approved_audit_run,
-            crash_at,
+        if self._committed:
+            raise RuntimeError("事务已经提交")
+        if approved_audit_run == "":
+            raise ValueError("正式 release 缺少已批准 audit run-id")
+        if set(release_artifact_paths) != RELEASE_PATHS:
+            raise ValueError("正式 release 未覆盖全部登记 artifacts")
+        expected_before_seal = set(release_artifact_paths) | {"formal.log"}
+        actual_before_seal = collect_regular_files(self.temp_root)
+        if actual_before_seal != expected_before_seal:
+            raise ValueError(
+                "正式事务文件集合不一致；"
+                f"缺少={sorted(expected_before_seal - actual_before_seal)}，"
+                f"多出={sorted(actual_before_seal - expected_before_seal)}"
+            )
+        release_map = build_artifact_map(self.temp_root, release_artifact_paths)
+        log_digest = self.log.seal()
+        manifest = build_manifest(
+            run_id=self.run_id,
+            run_type="formal",
+            approved_audit_run=approved_audit_run,
+            input_fingerprint=input_fingerprint,
+            runtime_signature=runtime_signature,
+            settings=settings,
+            release_artifacts=release_map,
+            audit_only_artifacts={},
+            log_path="formal.log",
+            log_digest=log_digest,
         )
-        raise RuntimeError(
-            "实现批次 1 禁止正式 commit；必须等待已验证 audit proof 接口"
+        manifest_digest = write_manifest(
+            self.temp_root / "manifest.json", manifest
         )
+        _fsync_tree(self.temp_root)
+        if crash_at == "before_rename":
+            raise SimulatedCrash("模拟 release rename 前崩溃")
+        os.rename(self.temp_root, self.final_root)
+        fsync_directory(self.releases_root)
+        if crash_at == "after_rename_before_pointer":
+            raise SimulatedCrash("模拟 release rename 后、pointer 切换前崩溃")
+        pointer = {
+            "release_id": self.run_id,
+            "manifest_path": f"{self.run_id}/manifest.json",
+            "manifest_sha256": manifest_digest.sha256,
+        }
+        descriptor, pointer_temp_name = tempfile.mkstemp(
+            prefix=".current_release.tmp-", dir=str(self.releases_root)
+        )
+        os.close(descriptor)
+        pointer_temp = Path(pointer_temp_name)
+        pointer_temp.unlink()
+        write_bytes_fsync(pointer_temp, canonical_json_bytes(pointer))
+        os.replace(pointer_temp, self.releases_root / "current_release.json")
+        fsync_directory(self.releases_root)
+        self._committed = True
+        return self.final_root
 
     def _commit_infrastructure_test_only(
         self,
@@ -188,3 +239,97 @@ class ReleaseTransaction:
 
     def __exit__(self, exc_type: object, exc: object, traceback: object) -> None:
         self.close()
+        if (
+            not self._committed
+            and exc_type is not SimulatedCrash
+            and self.temp_root.exists()
+        ):
+            shutil.rmtree(self.temp_root)
+
+
+class AuditTransaction:
+    """以原子 rename 封存一次不可变 assembly dry-run。"""
+
+    def __init__(self, audits_root: Path, run_id: str) -> None:
+        _validate_run_id(run_id)
+        self.audits_root = audits_root
+        self.run_id = run_id
+        self.audits_root.mkdir(parents=True, exist_ok=True)
+        self.final_root = self.audits_root / run_id
+        if self.final_root.exists() or self.final_root.is_symlink():
+            raise FileExistsError(f"audit run-id 已存在：{run_id}")
+        temp = tempfile.mkdtemp(prefix=f".{run_id}.tmp-", dir=str(audits_root))
+        self.temp_root = Path(temp)
+        for directory in ("modeling", "splits", "reports"):
+            (self.temp_root / directory).mkdir()
+        self.log = SealedLog(self.temp_root / "audit.log")
+        self._committed = False
+
+    def write_artifact(self, relative_path: str, payload: bytes) -> Path:
+        if self.log.sealed:
+            raise RuntimeError("日志封口后禁止写入 artifact")
+        path = secure_join(self.temp_root, relative_path)
+        write_bytes_fsync(path, payload)
+        return path
+
+    def commit(
+        self,
+        *,
+        input_fingerprint: str,
+        runtime_signature: Mapping[str, str],
+        settings: Mapping[str, Any],
+        release_artifact_paths: set[str],
+        audit_only_artifact_paths: set[str],
+    ) -> Path:
+        if self._committed:
+            raise RuntimeError("事务已经提交")
+        if set(release_artifact_paths) != RELEASE_PATHS:
+            raise ValueError("audit 未覆盖全部正式候选 artifacts")
+        if set(audit_only_artifact_paths) != AUDIT_ONLY_PATHS:
+            raise ValueError("audit 未覆盖全部 audit-only artifacts")
+        expected = (
+            set(release_artifact_paths)
+            | set(audit_only_artifact_paths)
+            | {"audit.log"}
+        )
+        actual = collect_regular_files(self.temp_root)
+        if actual != expected:
+            raise ValueError(
+                "audit 事务文件集合不一致；"
+                f"缺少={sorted(expected - actual)}，多出={sorted(actual - expected)}"
+            )
+        release_map = build_artifact_map(
+            self.temp_root, release_artifact_paths
+        )
+        audit_only_map = build_artifact_map(
+            self.temp_root, audit_only_artifact_paths
+        )
+        log_digest = self.log.seal()
+        manifest = build_manifest(
+            run_id=self.run_id,
+            run_type="audit",
+            input_fingerprint=input_fingerprint,
+            runtime_signature=runtime_signature,
+            settings=settings,
+            release_artifacts=release_map,
+            audit_only_artifacts=audit_only_map,
+            log_path="audit.log",
+            log_digest=log_digest,
+        )
+        write_manifest(self.temp_root / "audit_manifest.json", manifest)
+        _fsync_tree(self.temp_root)
+        os.rename(self.temp_root, self.final_root)
+        fsync_directory(self.audits_root)
+        self._committed = True
+        return self.final_root
+
+    def close(self) -> None:
+        self.log.close_unsealed()
+
+    def __enter__(self) -> "AuditTransaction":
+        return self
+
+    def __exit__(self, exc_type: object, exc: object, traceback: object) -> None:
+        self.close()
+        if not self._committed and self.temp_root.exists():
+            shutil.rmtree(self.temp_root)

@@ -122,10 +122,11 @@ def test_artifact_metadata_rejects_illegal_row_value(tmp_path: Path) -> None:
     row = {
         "compound_id": "CMP:AAAAAAAAAAAAAA-BBBBBBBBBB-C",
         "dataset_role": "development",
+        "clear_positive_count": "12",
+        "clear_negative_count": "1",
         "decision": "include_positive",
-        "review_reason": "非法决定",
-        "reviewer": "测试",
-        "reviewed_at_utc": "2026-07-05T00:00:00Z",
+        "resolved_label": "1",
+        "resolution_reason": "非法决定",
     }
     path = root / schema.path
     path.parent.mkdir(parents=True)

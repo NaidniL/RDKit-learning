@@ -267,10 +267,11 @@ ROLE_RESOLUTION_FIELDS = (
 CONFLICT_REVIEW_FIELDS = (
     field("compound_id"),
     field("dataset_role", enum_name="DatasetRole"),
+    field("clear_positive_count", FieldType.INTEGER, numeric_min=0),
+    field("clear_negative_count", FieldType.INTEGER, numeric_min=0),
     field("decision", enum_name="ReviewDecision"),
-    field("review_reason"),
-    field("reviewer"),
-    field("reviewed_at_utc", FieldType.UTC_TIME),
+    field("resolved_label", FieldType.INTEGER, nullable=True, numeric_min=0, numeric_max=1),
+    field("resolution_reason"),
 )
 
 
@@ -479,8 +480,10 @@ ARTIFACT_SCHEMAS: tuple[ArtifactSchema, ...] = (
             field("dataset_role", enum_name="DatasetRole"),
             field("clear_positive_count", FieldType.INTEGER, numeric_min=0),
             field("clear_negative_count", FieldType.INTEGER, numeric_min=0),
-        )
-        + CONFLICT_REVIEW_FIELDS[2:],
+            field("decision", enum_name="ReviewDecision"),
+            field("resolved_label", FieldType.INTEGER, nullable=True, numeric_min=0, numeric_max=1),
+            field("resolution_reason"),
+        ),
         ("compound_id", "dataset_role"),
         ("compound_id", "dataset_role"),
     ),
@@ -561,6 +564,17 @@ ARTIFACT_SCHEMAS: tuple[ArtifactSchema, ...] = (
         ("split", "source_combination", "label"),
     ),
     csv_schema(
+        "reports/evidence_type_crosstab.csv",
+        (
+            field("split", enum_name="QuerySplit"),
+            field("evidence_type_combination"),
+            field("label", FieldType.INTEGER, numeric_min=0, numeric_max=1),
+            field("count", FieldType.INTEGER, numeric_min=0),
+        ),
+        ("split", "evidence_type_combination", "label"),
+        ("split", "evidence_type_combination", "label"),
+    ),
+    csv_schema(
         "reports/descriptor_summary.csv",
         (
             field("split", enum_name="QuerySplit"),
@@ -582,11 +596,29 @@ ARTIFACT_SCHEMAS: tuple[ArtifactSchema, ...] = (
         ("split", "descriptor"),
     ),
     csv_schema(
+        "reports/descriptor_failures.csv",
+        (
+            field("compound_id"),
+            field("query_split", enum_name="QuerySplit"),
+            field("descriptor"),
+            field("error_reason"),
+        ),
+        ("compound_id", "query_split", "descriptor"),
+        ("query_split", "compound_id", "descriptor"),
+    ),
+    csv_schema(
         "reports/scaffold_summary.csv",
         (
             field("split", enum_name="QuerySplit"),
             field("unique_scaffold_count", FieldType.INTEGER, numeric_min=0),
             field("singleton_scaffold_count", FieldType.INTEGER, numeric_min=0),
+            field(
+                "singleton_scaffold_rate",
+                FieldType.FLOAT,
+                nullable=True,
+                numeric_min=0,
+                numeric_max=1,
+            ),
             field(
                 "compound_weighted_overlap",
                 FieldType.FLOAT,
@@ -611,6 +643,7 @@ ARTIFACT_SCHEMAS: tuple[ArtifactSchema, ...] = (
         (
             field("query_split", enum_name="QuerySplit"),
             field("count", FieldType.INTEGER, numeric_min=0),
+            field("missing", FieldType.INTEGER, numeric_min=0),
             field(
                 "mean", FieldType.FLOAT, nullable=True, numeric_min=0, numeric_max=1
             ),
@@ -631,6 +664,27 @@ ARTIFACT_SCHEMAS: tuple[ArtifactSchema, ...] = (
         ),
         ("query_split",),
         ("query_split",),
+    ),
+    csv_schema(
+        "reports/source_label_association.csv",
+        (
+            field("split", enum_name="QuerySplit"),
+            field("chi2_statistic", FieldType.FLOAT, nullable=True, numeric_min=0),
+            field(
+                "chi2_pvalue",
+                FieldType.FLOAT,
+                nullable=True,
+                numeric_min=0,
+                numeric_max=1,
+            ),
+            field("cramers_v", FieldType.FLOAT, numeric_min=0, numeric_max=1),
+            field("effective_rows", FieldType.INTEGER, numeric_min=0),
+            field("effective_columns", FieldType.INTEGER, numeric_min=0),
+            field("test_status", enum_name="TestStatus"),
+            field("source_label_confounding_warning", FieldType.BOOLEAN),
+        ),
+        ("split",),
+        ("split",),
     ),
     csv_schema(
         "reports/distribution_shift.csv",
@@ -724,10 +778,9 @@ ARTIFACT_SCHEMAS: tuple[ArtifactSchema, ...] = (
             field("clear_negative_count", FieldType.INTEGER, numeric_min=0),
             field("record_keys_json", FieldType.JSON, canonical_array=True),
             field("review_status", enum_name="ReviewStatus"),
-            field("decision", nullable=True, enum_name="ReviewDecision"),
-            field("review_reason", nullable=True),
-            field("reviewer", nullable=True),
-            field("reviewed_at_utc", FieldType.UTC_TIME, nullable=True),
+            field("decision", enum_name="ReviewDecision"),
+            field("resolved_label", FieldType.INTEGER, nullable=True, numeric_min=0, numeric_max=1),
+            field("resolution_reason"),
         ),
         ("compound_id", "dataset_role"),
         ("compound_id", "dataset_role"),

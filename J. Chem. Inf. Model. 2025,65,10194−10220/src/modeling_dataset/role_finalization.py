@@ -30,6 +30,16 @@ def _rules(item: CoreRoleResolution, leakage: LeakageStatus, tautomer: bool) -> 
         result.add(ResolutionRule.NO_CLEAR_BINARY_LABEL.value)
     elif item.review_status is ReviewStatus.CONFIRMED_EXCLUDE:
         result.add(ResolutionRule.CONFIRMED_EXACT_LABEL_CONFLICT_EXCLUDE.value)
+    elif item.review_status is ReviewStatus.AUTOMATIC_EXCLUDE:
+        if item.clear_positive_count + item.clear_negative_count <= 10:
+            result.add(ResolutionRule.CONFLICT_TOTAL_COUNT_LE_10_EXCLUDE.value)
+        else:
+            result.add(ResolutionRule.CONFLICT_COUNT_MARGIN_LE_10_EXCLUDE.value)
+    elif item.review_status is ReviewStatus.AUTOMATIC_RESOLVED:
+        if item.label_status is LabelStatus.CLEAR_POSITIVE:
+            result.add(ResolutionRule.CONFLICT_MAJORITY_POSITIVE.value)
+        else:
+            result.add(ResolutionRule.CONFLICT_MAJORITY_NEGATIVE.value)
     if item.structure_status == StructureStatus.INELIGIBLE.value:
         result.add(ResolutionRule.STRUCTURE_INELIGIBLE.value)
     if leakage is LeakageStatus.EXACT_OVERLAP:
@@ -47,6 +57,10 @@ def _exclusion_reasons(
     reasons = set(item.structure_reasons)
     if item.label_status is LabelStatus.CONFLICT:
         reasons.add("label_conflict")
+        if item.clear_positive_count + item.clear_negative_count <= 10:
+            reasons.add("label_conflict_total_count_le_10")
+        else:
+            reasons.add("label_conflict_count_margin_le_10")
     elif item.label_status is LabelStatus.UNCERTAIN:
         reasons.add("label_uncertain")
     if leakage is LeakageStatus.EXACT_OVERLAP:

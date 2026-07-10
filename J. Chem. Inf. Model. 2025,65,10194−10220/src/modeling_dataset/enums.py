@@ -54,10 +54,16 @@ class ReviewStatus(ControlledStringEnum):
     NOT_REQUIRED = "not_required"
     PENDING = "pending"
     CONFIRMED_EXCLUDE = "confirmed_exclude"
+    AUTOMATIC_EXCLUDE = "automatic_exclude"
+    AUTOMATIC_RESOLVED = "automatic_resolved"
 
 
 class ReviewDecision(ControlledStringEnum):
     CONFIRM_EXCLUDE = "confirm_exclude"
+    EXCLUDE_TOTAL_COUNT_LE_10 = "exclude_total_count_le_10"
+    EXCLUDE_COUNT_MARGIN_LE_10 = "exclude_count_margin_le_10"
+    ASSIGN_POSITIVE = "assign_positive"
+    ASSIGN_NEGATIVE = "assign_negative"
 
 
 class SplitEligibility(ControlledStringEnum):
@@ -117,6 +123,10 @@ class ResolutionRule(ControlledStringEnum):
     CONFIRMED_EXACT_LABEL_CONFLICT_EXCLUDE = (
         "confirmed_exact_label_conflict_exclude"
     )
+    CONFLICT_TOTAL_COUNT_LE_10_EXCLUDE = "conflict_total_count_le_10_exclude"
+    CONFLICT_COUNT_MARGIN_LE_10_EXCLUDE = "conflict_count_margin_le_10_exclude"
+    CONFLICT_MAJORITY_POSITIVE = "conflict_majority_positive"
+    CONFLICT_MAJORITY_NEGATIVE = "conflict_majority_negative"
     NO_CLEAR_BINARY_LABEL = "no_clear_binary_label"
     STRUCTURE_INELIGIBLE = "structure_ineligible"
     EXTERNAL_EXACT_LEAKAGE = "external_exact_leakage"

@@ -15,11 +15,10 @@ from typing import Any, Callable, Mapping, cast
 from .serialization import canonical_json, digest_file
 
 
-POLICY_SHA256 = "11fc682604a1f9abef1fcca09f41050b482544869a86521d556355acf694c2c5"
+POLICY_SHA256 = "1d2c7c253e8fd67e329d563c228bdeff36b4dc8e5b1d4f611a66531f5c3eaa7e"
 POLICY_PATH = "docs/modeling_dataset_policy.md"
 POLICY_SHA_PATH = "docs/modeling_dataset_policy.sha256"
 CLEANING_MANIFEST_PATH = "reports/cleaning/current/cleaning_manifest.json"
-MANUAL_CONFLICT_PATH = "data/manual/modeling_conflict_decisions.csv"
 CLEANING_TAG = "dataset-cleaning-v1.2"
 CLEANING_TAG_COMMIT = "69f12496d98aee334f955893cf102b53d70aa0cd"
 CLEANING_RUN_ID = "20260705_154614_567321_UTC_444f5190"
@@ -271,18 +270,6 @@ def validate_processed_files(root: Path) -> dict[str, dict[str, Any]]:
     return result
 
 
-def _manual_conflict_metadata(root: Path) -> dict[str, Any]:
-    path = root / MANUAL_CONFLICT_PATH
-    if not path.exists():
-        return {"path": MANUAL_CONFLICT_PATH, "state": "missing"}
-    if not path.is_file():
-        raise ValueError("人工冲突路径存在但不是普通文件")
-    return {
-        "state": "present",
-        **_relative_file_metadata(root, path, csv_rows=True),
-    }
-
-
 def build_input_descriptor(
     root: Path, *, parameters: Mapping[str, Any] | None = None
 ) -> dict[str, Any]:
@@ -309,7 +296,11 @@ def build_input_descriptor(
             "settings": CLEANING_SETTINGS,
         },
         "processed_files": [processed[name] for name in PROCESSED_FILES],
-        "manual_conflict_file": _manual_conflict_metadata(root),
+        "conflict_resolution": {
+            "method": "ordered_clear_label_counts_v1",
+            "total_count_max": 10,
+            "count_margin_max": 10,
+        },
         "implementation_files": implementation,
         "runtime_signature": runtime_signature(),
         "parameters": {

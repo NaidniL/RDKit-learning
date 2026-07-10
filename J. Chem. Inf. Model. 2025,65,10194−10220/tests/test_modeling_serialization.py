@@ -117,6 +117,32 @@ def test_golden_csv_is_sorted_by_enum_rank_and_row_order_independent() -> None:
     assert expected.endswith(b"\n")
 
 
+def test_split_aliases_use_query_split_rank() -> None:
+    schema = SCHEMA_REGISTRY["reports/split_summary.csv"]
+    rows = [
+        {
+            "split": split,
+            "sample_count": 0,
+            "positive_count": 0,
+            "negative_count": 0,
+            "positive_rate": None,
+        }
+        for split in (
+            "external_test",
+            "validation",
+            "external_tautomer_sensitivity",
+            "train",
+        )
+    ]
+    text = serialize_csv(rows, schema).decode("utf-8")
+    assert [line.split(",", 1)[0] for line in text.splitlines()[1:]] == [
+        "train",
+        "validation",
+        "external_test",
+        "external_tautomer_sensitivity",
+    ]
+
+
 def test_logical_csv_row_count_handles_multiline_fields(tmp_path: Path) -> None:
     payload = serialize_csv(
         [
