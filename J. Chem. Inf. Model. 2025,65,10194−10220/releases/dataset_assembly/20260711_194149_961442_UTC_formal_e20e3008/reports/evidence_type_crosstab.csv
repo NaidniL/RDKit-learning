@@ -1,0 +1,15 @@
+split,evidence_type_combination,label,count
+train,animal_experimental,0,398
+train,animal_experimental,1,329
+train,animal_experimental|human_weight_of_evidence,0,3
+train,animal_experimental|human_weight_of_evidence,1,5
+train,human_weight_of_evidence,0,1
+train,human_weight_of_evidence,1,0
+validation,animal_experimental,0,101
+validation,animal_experimental,1,83
+validation,animal_experimental|human_weight_of_evidence,0,0
+validation,animal_experimental|human_weight_of_evidence,1,1
+external_test,animal_experimental,0,199
+external_test,animal_experimental,1,256
+external_tautomer_sensitivity,animal_experimental,0,199
+external_tautomer_sensitivity,animal_experimental,1,256

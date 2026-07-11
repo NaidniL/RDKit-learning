@@ -1,0 +1,4 @@
+comparison_scope,compound_id_a,dataset_role_a,compound_id_b,dataset_role_b,relation_type,similarity,label_a,label_b,label_relation
+external,CMP:FZBOFNLBBMIJMT-UHFFFAOYSA-N,external,CMP:ZBUIFCQCAOFRJN-UHFFFAOYSA-N,external,high_similarity,1,1,0,opposite
+external,CMP:GBROPGWFBFCKAG-UHFFFAOYSA-N,external,CMP:YNPNZTXNASCQKK-UHFFFAOYSA-N,external,high_similarity,0.8571428571428571,1,0,opposite
+external,CMP:LGLFFNDHMLKUMI-UHFFFAOYSA-N,external,CMP:VFCNQNZNPKRXIT-UHFFFAOYSA-N,external,high_similarity,0.87096774193548387,1,0,opposite

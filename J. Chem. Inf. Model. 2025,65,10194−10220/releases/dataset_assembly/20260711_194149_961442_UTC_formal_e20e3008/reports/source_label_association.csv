@@ -1,0 +1,5 @@
+split,chi2_statistic,chi2_pvalue,cramers_v,effective_rows,effective_columns,test_status,source_label_confounding_warning
+train,1.7814286637466406,0.41036251300690973,0.049197757876660843,3,2,ok,false
+validation,1.2089156314699792,0.27154698468023836,0.080837361962318596,2,2,ok,false
+external_test,,,0,1,2,degenerate_table,false
+external_tautomer_sensitivity,,,0,1,2,degenerate_table,false

@@ -1,0 +1,5 @@
+split,sample_count,positive_count,negative_count,positive_rate
+train,736,334,402,0.45380434782608697
+validation,185,84,101,0.45405405405405408
+external_test,455,256,199,0.56263736263736264
+external_tautomer_sensitivity,455,256,199,0.56263736263736264
