@@ -40,6 +40,7 @@ ALLOWED_CHANGED_PATHS = {
     "reports/modeling/final_external_evaluation_audit.md",
     "reports/modeling/final_external_evaluation_v1/external_evaluation.md",
     "reports/modeling/final_external_evaluation_v1/external_evaluation_manifest.json",
+    "reports/modeling/final_model_v1_summary.md",
 }
 
 
