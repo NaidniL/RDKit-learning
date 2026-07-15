@@ -1,4 +1,4 @@
-"""二分类 baseline 的确定性指标（仅在 development split 上调用）。"""
+"""二分类指标；external-final 只在 final artifact 锁定后调用。"""
 
 from __future__ import annotations
 
@@ -89,7 +89,7 @@ def binary_metrics(
 def binary_confusion_counts(
     y_true: Sequence[int], y_probability: Sequence[float], *, threshold: float = 0.5
 ) -> dict[str, int]:
-    """只用于 development split 的聚合混淆计数，永不接受 external 输出。"""
+    """返回聚合混淆计数；不写任何样本级预测。"""
 
     truth = np.asarray(y_true, dtype=int)
     probability = np.asarray(y_probability, dtype=float)

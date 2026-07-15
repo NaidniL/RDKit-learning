@@ -139,3 +139,43 @@ def load_release_after_full_verification(
         manifest_sha256=manifest_sha256,
         manifest=manifest,
     )
+
+
+def load_formal_release_metadata_without_external_reads(releases_root: Path) -> DatasetRelease:
+    """锁定 formal release 元数据，但不遍历或打开任何 split artifact。
+
+    这是 ``freeze-final`` 的专用入口：它只会随后通过受限 split loader 读取
+    train/validation。相应 CSV 在 ``DatasetRelease.read_csv`` 中仍逐次验证
+    hash、bytes、rows 和 schema；external artifact 从未被打开。
+    """
+
+    if not isinstance(releases_root, Path) or releases_root.name != "dataset_assembly":
+        raise ValueError("训练只能从 releases/dataset_assembly 的 current_release.json 进入")
+    pointer_path = secure_join(releases_root, "current_release.json", must_exist=True)
+    raw = pointer_path.read_bytes()
+    try:
+        pointer = json.loads(raw.decode("utf-8"))
+    except (UnicodeDecodeError, json.JSONDecodeError) as exc:
+        raise ValueError("current_release.json 无法解析") from exc
+    if raw != canonical_json_bytes(pointer) or not isinstance(pointer, dict):
+        raise ValueError("current_release.json 不是 canonical pointer")
+    release_id = pointer.get("release_id")
+    manifest_sha256 = pointer.get("manifest_sha256")
+    if not isinstance(release_id, str) or not isinstance(manifest_sha256, str):
+        raise ValueError("current_release pointer 缺少 release_id 或 manifest_sha256")
+    expected_manifest = f"{release_id}/manifest.json"
+    if pointer.get("manifest_path") != expected_manifest:
+        raise ValueError("pointer manifest_path 与 release_id 不一致")
+    manifest_path = secure_join(releases_root, expected_manifest, must_exist=True)
+    if digest_file(manifest_path).sha256 != manifest_sha256:
+        raise ValueError("release manifest SHA-256 与 pointer 不一致")
+    manifest = load_manifest(manifest_path)
+    if manifest.get("run_id") != release_id or manifest.get("run_type") != "formal":
+        raise ValueError("冻结 manifest run 信息不一致")
+    return DatasetRelease(
+        releases_root=releases_root,
+        root=manifest_path.parent,
+        release_id=release_id,
+        manifest_sha256=manifest_sha256,
+        manifest=manifest,
+    )
