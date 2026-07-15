@@ -3,3 +3,12 @@ __pycache__/
 *.py[cod]
 .ipynb_checkpoints/
 .DS_Store
+
+# Local editor state.
+.obsidian/
+
+# Superseded, unapproved dataset-assembly audit runs. These are reproducible
+# temporary outputs; the approved audit run remains versioned.
+J. Chem. Inf. Model. 2025,65,10194−10220/audits/dataset_assembly/20260706_061545_851423_UTC_audit_6a723b44/
+J. Chem. Inf. Model. 2025,65,10194−10220/audits/dataset_assembly/20260706_065332_750403_UTC_audit_a3141b3d/
+J. Chem. Inf. Model. 2025,65,10194−10220/audits/dataset_assembly/20260706_071603_051946_UTC_audit_21d9363e/
