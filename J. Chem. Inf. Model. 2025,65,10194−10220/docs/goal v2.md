@@ -1,525 +1,144 @@
-深化方向可以是：
+**v2 已完成独立 external 验证，但按预注册标准应判定为“部分成功”，不能判定为“完全成功”。**
+
+这个结论很干净，而且比事后放宽 sensitivity 门槛更有价值。
+
+从结果看，v2 的核心研究假设得到了相当强的支持：
+
+- coverage 为 65.31%，刚刚达到一个可用但偏低的水平；
+    
+- covered subset 上 MCC 0.647、accuracy 0.875，说明在模型愿意一致作答时，预测质量较高；
+    
+- specificity 0.958，说明覆盖范围内假阳性控制得很好；
+    
+- inconclusive 样本的成员平均错误率为 0.392，明显高于 covered 样本的 0.125，说明模型分歧确实成功富集了困难样本；
+    
+- 独立 NTP external 未参与 v2 设计，且 exact、connectivity、tautomer 三层重叠均为零；
+    
+- one-shot lock、无样本级预测、禁止重跑、模型与 policy 不变，保证了结果的确认性。
+    
+
+但 sensitivity 为 0.625，低于预注册下限 0.65，因此不能声称 v2 达到了完整的筛查目标。这里即使只差 0.025，也不能事后说“差不多算通过”。49 个样本本身较少，covered positive 数更少，少预测对一个阳性样本就可能让 sensitivity 从 0.625 上升到 0.75；这说明点估计波动可能很大，但在没有预注册置信区间判定规则的情况下，仍应机械地按失败处理。
+
+
+建议将 v2 的最终状态写为：
+
+> **v2 selective consensus system：独立 external 验证部分成功。**  
+> 该系统在预注册 coverage 范围内表现出较高的 covered-set MCC、accuracy 和 specificity，且 inconclusive 输出有效富集了成员模型的错误。然而，covered-set sensitivity 为 0.625，低于预注册最低要求 0.65，因此未满足“完全成功”的全部判据。
+
+不要使用：
+
+- “v2 验证成功”；
+    
+- “v2 优于 v1”；
+    
+- “v2 已可用于致癌物筛查”；
+    
+- “共识模型显著提高性能”。
+    
+
+更准确的标题可以是：
+
+> **Independent external validation of a selective carcinogenicity consensus: strong specificity and error interception, but insufficient sensitivity**
+
+## 现在应立即完成的收尾
+
+### 1. 冻结结果判定文件
+
+建立类似：
 
 ```text
-
-不同特征视角是否捕捉不同化学规律？
-
-descriptor 模型、fingerprint 模型、scaffold/nearest-neighbor 模型的错误是否互补？
-
-模型分歧能否作为“不确定性”或“需要人工审查”的信号？
-
+reports/modeling/final_consensus_v2_evaluation_v1/
+├── external_evaluation.md
+├── outcome_classification.json
+├── evaluation_manifest.json
+└── complete_audit.md
 ```
 
-这比“再跑一个 BiLSTM”更有价值。
+`outcome_classification.json` 应机械记录：
 
-你后续可以做一个 **uncertainty-aware consensus v2**：
+```json
+{
+  "status": "PARTIAL_SUCCESS",
+  "coverage_pass": true,
+  "covered_mcc_pass": true,
+  "error_enrichment_pass": true,
+  "sensitivity_pass": false,
+  "overall_success": false,
+  "failure_reason": "covered sensitivity 0.625000 < preregistered minimum 0.650000"
+}
+```
+
+不要只在 Markdown 中人工解释，避免以后被重新诠释。
+
+### 2. 打最终标签
+
+建议标签名称明确包含“partial”或“evaluated”，例如：
 
 ```text
-
-Model A: LightGBM + descriptors
-
-Model B: RF / LightGBM + MACCS
-
-Model C: fingerprint nearest-neighbor baseline 或 ECFP 模型
-
+final-consensus-v2-external-partial-v1
 ```
 
-输出不是简单 0/1，而是：
+或：
 
 ```text
-
-high-confidence carcinogen
-
-high-confidence noncarcinogen
-
-inconclusive / needs review
-
-out-of-domain
-
+consensus-v2-external-evaluated-v1
 ```
 
-这就从“分类器”升级成了“辅助筛查系统”。
-
-### 2. 把 explainability 当作化学问题，而不是画几张 SHAP 图
-
-原论文用了 SHAP 来寻找 MACCS keys 和 Bemis–Murcko scaffolds 这类结构线索。([PMC][1]) 你可以吸收这个思路，但不要停留在“特征重要性排行榜”。
-
-更好的深化是：
+不建议使用：
 
 ```text
-
-哪些描述符推动模型判断为 carcinogen？
-
-这些描述符是否对应分子大小、疏水性、芳香性、环系统、极性表面积？
-
-false positive 是否集中在某类结构？
-
-false negative 是否是某些外部集特有结构？
-
-高风险 scaffold 是否在 train 中有类似物？
-
+final-model-v2-success
+consensus-v2-validated
 ```
 
-也就是从“模型解释”走向“化学解释”。
+因为它们会掩盖 sensitivity 未达标。
 
-你现在 final model 是 `LightGBM + descriptors`，这其实非常适合解释。因为 descriptor 比 2048-bit fingerprint 更容易讲清楚。你可以做：
+### 3. 补充不确定性区间，但不得改变判定
 
-```text
+现在可以进行**纯描述性的统计区间分析**，前提是：
 
-global feature importance
+- 不重新读取 external 行；
+    
+- 只使用已锁定的聚合 confusion matrix；
+    
+- 不改变 PASS/FAIL；
+    
+- 不据此修改 policy。
+    
 
-SHAP summary
+covered subset 的 sensitivity 0.625 很可能对应 5/8 个阳性预测正确；specificity 0.9583 很可能对应 23/24 个阴性判断正确。若确实如此，样本量非常小，应报告 Wilson 或 Clopper–Pearson 区间，突出估计不稳定性。
 
-SHAP dependence plots
+但无论区间是否跨过 0.65，冻结判定仍然是：
 
-top positive descriptors
+> sensitivity criterion failed.
 
-top negative descriptors
+置信区间只能帮助解释结果，不能代替预注册点估计门槛。
 
-descriptor 分布对比：train vs validation vs external
+### 4. 与成员模型做冻结好的公平比较
 
-错误样本的 descriptor profile
+确认 external 报告已经包括：
 
-```
+- 三个成员在全部 49 个样本上的表现；
+    
+- 三个成员在相同 32 个 covered subset 上的表现；
+    
+- consensus 与成员在同一 covered subset 的差异；
+    
+- 17 个 inconclusive 中各成员错误情况；
+    
+- carcinogen 与 noncarcinogen 的 class-conditional coverage。
+    
 
-这个方向会比硬补 BiLSTM 更适合你现在的项目基础。
+这里尤其要看：
 
-### 3. 建立 applicability domain，而不是只报 AUROC
+> v2 是否主要通过拒答阳性样本换来了高 specificity。
 
-原论文强调把模型用于 IARC 2B 这类待判断化合物，并区分 within-domain compounds。([PMC][1]) 这背后的思想是：**模型不是对所有化学空间都同样可靠。**
+总数据中阳性为 15、阴性为 34，而 covered sensitivity 只有 0.625。如果阳性 coverage 明显低于阴性 coverage，v2 的实际行为可能是更倾向于拒答或漏掉致癌物。这个结果必须显式报告，不能只突出总体 coverage 0.653。
 
-你现在已经有泄漏审计、nearest-neighbor、scaffold、tautomer sensitivity 的基础。下一步可以深化为：
+### v2 最终冻结完成
 
-```text
-
-给每个预测分配一个适用域状态：
-
-- in-domain
-
-- near-domain
-
-- scaffold-novel
-
-- low-similarity external
-
-- conflicting-neighbor
-
-```
-
-然后看：
-
-```text
-
-in-domain external AUROC 是否高于 out-of-domain？
-
-低相似度样本是否更容易错？
-
-scaffold novel 样本的 MCC 是否下降？
-
-高相似但标签相反的 activity cliff 是否造成错误？
-
-```
-
-这会把你的项目从“模型评估”提升到“模型可靠性研究”。这也是 AI4S/化学 ML 里很核心的能力。
-
-### 4. 把 inconclusive 当作合理输出，而不是错误
-
-原论文 consensus 的一个重要点是允许 inconclusive，而不是强迫每个化合物都二分类。([PMC][1])
-
-这对你的方向很有启发。毒性预测本来就存在标签噪声、物种差异、数据库冲突、结构相似但标签相反等问题。你 v1 数据阶段已经非常认真地处理了 conflict 和 uncertain；模型阶段也可以继承这种思想。
-
-v2 可以设计：
-
-```text
-
-如果模型概率接近 0.5 → inconclusive
-
-如果多个模型分歧 → inconclusive
-
-如果 out-of-domain → inconclusive
-
-如果 nearest neighbor 标签冲突 → inconclusive
-
-```
-
-然后评价两套指标：
-
-```text
-
-coverage：有多少样本给出明确判断
-
-selective performance：只在明确判断样本上的 AUROC / MCC / accuracy
-
-```
-
-这比硬追求全体样本 accuracy 更像真实毒理筛查场景。
-
-### 5. 把数据工程变成你的核心优势
-
-原论文有数据清洗和去重，但你的优势是更系统：正式 release、manifest、pointer、hash、external lock、prediction digest、repeat lock。训练策略也明确规定训练入口、外部集隔离、候选模型和 validation 使用规则。
-
-这其实可以成为你项目的主线：
-
-> 传统 QSAR 论文往往重模型、轻数据审计；本项目尝试把可追溯数据 release、泄漏审计和外部评估锁定引入化学毒性预测流程。
-
-这个角度很适合写进作品集，也很适合面试时讲。它体现的是“我不只是会调包训练模型，我懂得怎么让实验结论可信”。
-
-### 6. 从“预测致癌性”扩展到“毒性建模通用框架”
-
-不要被这篇论文绑死在 carcinogenicity 上。你现在真正练出来的是一套流程：
-
-```text
-
-多来源毒性数据清洗
-
-结构标准化
-
-标签冲突处理
-
-split 与 leakage audit
-
-模型训练与 external 锁定
-
-解释和适用域分析
-
-```
-
-这套流程可以迁移到：
-
-```text
-
-Ames mutagenicity
-
-skin sensitization
-
-acute toxicity
-
-hepatotoxicity
-
-cardiotoxicity / hERG
-
-environmental toxicity
-
-材料安全性筛查
-
-```
-
-这就是你“自己的方向”可以深化的地方：**做可信 QSAR / tox ML pipeline，而不是单篇论文复刻。**
-
-## 三、后续工作规划：不要叫“复刻 v2”，叫“研究深化 v2”
-
-我建议你接下来分成四个阶段。
-
-## 阶段 0：封存 v1，并写出“可信基线报告”
-
-目标不是新结果，而是把当前成果变成一个可展示成品。
-
-马上做：
-
-```text
-
-final external audit
-
-git commit
-
-tag final-model-external-v1
-
-final_model_v1_summary.md
-
-```
-
-报告核心结论写成：
-
-```text
-
-在严格数据冻结、预注册候选选择和一次性 external 评估下，
-
-LightGBM + descriptors 获得 validation AUROC 0.7659，
-
-primary external AUROC 0.7194、AUPRC 0.7728、MCC 0.2878。
-
-该结果作为后续不确定性、适用域和解释性研究的可信基线。
-
-```
-
-重点是“可信基线”，不是“最好模型”。
-
-## 阶段 1：做 v1 的研究性诊断，不改模型
-
-这一阶段只分析，不训练新 final，不用 external 调参。
-
-建议做 5 个报告：
-
-```text
-
-1. validation vs external 性能落差分析
-
-2. descriptor 分布漂移分析
-
-3. external 错误类型分析
-
-4. scaffold / similarity / applicability domain 分层评估
-
-5. LightGBM descriptor SHAP 解释
-
-```
-
-注意措辞：external 错误分析只能作为“post hoc analysis”，不能用于回头改 v1。
-
-最值得做的是 applicability domain 分层。比如：
-
-```text
-
-按 external 到 train 的最大 ECFP4 similarity 分桶：
-
-0.85+
-
-0.70–0.85
-
-0.50–0.70
-
-<0.50
-
-分别报告 AUROC、MCC、coverage、错误数。
-
-```
-
-如果你发现 in-domain 表现明显更好，那这个项目立刻就从“跑模型”变成了“解释为什么外测下降”。
-
-## 阶段 2：做 uncertainty-aware consensus，但只在 development 内设计
-
-这一阶段吸收原论文 consensus 的思想，但换成你的研究问题。
-
-不要目标设为“复刻三模型 consensus”，而是设为：
-
-> 在不牺牲 external 隔离的前提下，模型分歧和适用域信息能否识别低可信预测？
-
-可做三个版本：
-
-```text
-
-Consensus A：LightGBM descriptors + RF MACCS + RF descriptors
-
-Consensus B：descriptor model + MACCS model + ECFP model
-
-Consensus C：model probability + nearest-neighbor agreement + applicability domain
-
-```
-
-输出三类：
-
-```text
-
-positive
-
-negative
-
-inconclusive
-
-```
-
-评价指标：
-
-```text
-
-coverage
-
-covered-set AUROC
-
-covered-set MCC
-
-inconclusive rate
-
-错误拦截率
-
-```
-
-这比单纯问“AUROC 高没高”更有研究价值。毒性预测中，能识别“我不确定”本身就是有用能力。
-
-## 阶段 3：把解释结果变成化学假设
-
-这一步最能体现“化学 + 机器学习”的结合。
-
-围绕 final descriptor model 和未来 consensus model，做：
-
-```text
-
-高 SHAP 正向 descriptor：对应什么化学性质？
-
-高风险 scaffold：是否富集芳香环、多环、卤素、疏水性？
-
-false positive 是否是结构上像 carcinogen 但标签为 negative？
-
-false negative 是否缺少 train 中类似结构？
-
-activity cliff pair 是否集中在某些 scaffold？
-
-```
-
-最终产出不是“模型解释图”，而是几条化学语言的结论，例如：
-
-```text
-
-模型更倾向于把高芳香性、高疏水性、较大环系统的化合物判为高风险；
-
-低相似度 external 分子和结构近邻标签冲突分子是主要错误来源；
-
-descriptor-only 模型在 external 上保留了一定泛化能力，但对特定 scaffold novel 化合物可靠性下降。
-
-```
-
-这才是你方向上的深化。
-
-## 阶段 4：抽象成一个可迁移 tox-ML 框架
-
-最后，把这个项目从“致癌性”抽象成：
-
-```text
-
-Trustworthy RDKit-based Toxicity Modeling Workflow
-
-```
-
-模块包括：
-
-```text
-
-data audit
-
-label resolution
-
-structure standardization
-
-leakage-safe split
-
-feature registry
-
-model registry
-
-external lock
-
-applicability domain
-
-uncertainty / inconclusive output
-
-interpretability report
-
-```
-
-之后你换任务时，比如 Ames 或 hERG，就不是从零开始，而是复用这套框架。
-
-这会非常适合作品集，因为它显示你有“做系统”的能力。
-
-## 四、我建议的实际执行顺序
-
-### 现在立刻做
-
-```text
-
-1. 封存 v1
-
-2. 写 final_model_v1_summary.md
-
-3. 写一页 method_takeaways_from_paper.md
-
-```
-
-`method_takeaways_from_paper.md` 不要写“原论文还做了什么我没做”，而写：
-
-```text
-
-从论文吸收的可迁移思想：
-
-- complementary representations
-
-- consensus as uncertainty handling
-
-- inconclusive output
-
-- SHAP / scaffold interpretation
-
-- applicability domain
-
-- deployment-oriented prediction workflow
-
-```
-
-### 接下来一周
-
-做 v1 诊断报告：
-
-```text
-
-descriptor SHAP
-
-external error analysis
-
-similarity / scaffold stratified metrics
-
-domain-aware performance report
-
-```
-
-这周不要训练新模型。
-
-### 第二周
-
-开始 development-only consensus 实验：
-
-```text
-
-RF MACCS
-
-RF descriptors
-
-LightGBM descriptors
-
-probability agreement
-
-inconclusive policy
-
-coverage-performance curve
-
-```
-
-如果这一步做得好，你的项目深度会明显超过“普通 QSAR baseline”。
-
-### 第三周以后
-
-再决定要不要补：
-
-```text
-
-E-state
-
-graph model
-
-SMILES model
-
-new toxicity endpoint
-
-small demo app
-
-```
-
-这些都不是当前最急的。
-
-## 五、你现在最应该避免的坑
-
-不要把“深化”理解成“再多跑几个模型”。你的 v1 已经证明你能跑模型了。后面真正有价值的是：
-
-```text
-
-为什么模型在 external 上下降？
-
-哪些样本可靠？
-
-哪些样本不该强行判断？
-
-哪些结构信号驱动预测？
-
-这套流程能不能迁移到其他毒性终点？
-
-```
-
-也不要用 external 错误来改 v1。可以分析，但不能调参。否则你前面辛辛苦苦建立的 external lock 就被自己破坏了。
+- 最终发布目录为 [`final_consensus_v2_evaluation_v1`](../reports/modeling/final_consensus_v2_evaluation_v1/)，标签固定为 `final-consensus-v2-external-partial-v1`。它只绑定既有的 external aggregate manifest/report，不重新读取任何 NTP candidate 行。
+- [`outcome_classification.json`](../reports/modeling/final_consensus_v2_evaluation_v1/outcome_classification.json) 已机械锁定为 `PARTIAL_SUCCESS`：coverage、同 covered subset MCC、错误富集和 specificity 通过；sensitivity 不通过，`overall_success=false`。
+- Wilson 95% 区间仅作描述：sensitivity 5/8 为 `[0.305742, 0.863156]`，specificity 23/24 为 `[0.797582, 0.992607]`；不改变预注册点估计判定。
+- 最终报告补充了 17 个 inconclusive 中三成员的聚合错误数（9、5、6），并保留 class-conditional coverage 的不平衡：carcinogen `0.533333`，noncarcinogen `0.705882`。
+- [`complete_audit.md`](../reports/modeling/final_consensus_v2_evaluation_v1/complete_audit.md) 为 `PASS`，验证来源 hashes、机械分类、描述性区间和不夸大 final tag。该目录及其审计均拒绝重冻结/改写。
